@@ -60,6 +60,8 @@ maybeTest("E2E Strategy Catalog to Position reload", async () => {
 
 maybeTest("E2E EQUITY_PAIR preview save reload and idempotency", async () => {
   const { createApp } = await import("../../apps/api/src/app.js");
+  const { insertEquityPair } = await import("../../apps/api/src/repositories/operation-repository.js");
+  const { withTransaction } = await import("../../apps/api/src/db/transaction.js");
   const client = new pg.Client({ connectionString: url }); await client.connect();
   const server = createApp().listen(0);
   try {
@@ -81,5 +83,8 @@ maybeTest("E2E EQUITY_PAIR preview save reload and idempotency", async () => {
     assert.equal(reloaded.templateType,"EQUITY_PAIR"); assert.equal(reloaded.legs.length,2); assert.deepEqual(reloaded.legs.map((x) => x.side),["BUY","SELL"]);
     const count = await client.query<{operations:string;legs:string}>(`SELECT (SELECT count(*)::text FROM operations WHERE id = $1) operations, (SELECT count(*)::text FROM operation_legs WHERE operation_id = $1) legs`,[saved.id]);
     assert.equal(count.rows[0]?.operations,"1"); assert.equal(count.rows[0]?.legs,"2");
+    await assert.rejects(() => withTransaction((tx) => insertEquityPair(tx,{strategyId:strategy.id,accountId:account.id,openedAt:"2026-06-02T10:00:00.000Z",sourceType:"MANUAL",legs:[{instrumentId:ptbr4.id,side:"BUY",quantity:"1",entryPrice:"1",currency:"BRL"},{instrumentId:"20000000-0000-4000-8000-000000009999",side:"SELL",quantity:"1",entryPrice:"1",currency:"BRL"}]})));
+    const rollback = await client.query<{count:string}>(`SELECT count(*)::text AS count FROM operations WHERE opened_at = '2026-06-02T10:00:00.000Z'`);
+    assert.equal(rollback.rows[0]?.count,"0");
   } finally { await new Promise<void>((resolve) => server.close(() => resolve())); await client.end(); }
 });

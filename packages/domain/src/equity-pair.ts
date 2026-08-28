@@ -19,8 +19,12 @@ export function calculateEquityPair(legs: EquityPairLeg[]): EquityPairMetrics {
   if (sell.length !== 1) throw new Error("MISSING_SELL_LEG");
   const buyLeg = buy[0]!; const sellLeg = sell[0]!;
   if (buyLeg.currency.trim().toUpperCase() !== sellLeg.currency.trim().toUpperCase()) throw new Error("CURRENCY_MISMATCH");
-  const longExposure = decimal(buyLeg.quantity, "quantity").mul(decimal(buyLeg.entryPrice, "entryPrice"));
-  const shortExposure = decimal(sellLeg.quantity, "quantity").mul(decimal(sellLeg.entryPrice, "entryPrice"));
+  const buyQuantity = decimal(buyLeg.quantity, "quantity"); const sellQuantity = decimal(sellLeg.quantity, "quantity");
+  const buyPrice = decimal(buyLeg.entryPrice, "entryPrice"); const sellPrice = decimal(sellLeg.entryPrice, "entryPrice");
+  if (buyQuantity.lte(0) || sellQuantity.lte(0)) throw new Error("INVALID_QUANTITY");
+  if (buyPrice.lt(0) || sellPrice.lt(0)) throw new Error("INVALID_ENTRY_PRICE");
+  const longExposure = buyQuantity.mul(buyPrice);
+  const shortExposure = sellQuantity.mul(sellPrice);
   const currency = buyLeg.currency.toUpperCase();
   return {
     longExposure: {status:"AVAILABLE", value:longExposure.toFixed(2), currency},

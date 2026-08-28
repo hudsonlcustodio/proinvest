@@ -12,4 +12,8 @@ test("GOLDEN-003 Long & Short", () => {
 test("equity pair rejects currency mismatch and duplicate sides", () => {
   assert.throws(() => calculateEquityPair([{side:"BUY",quantity:"1",entryPrice:"1",currency:"BRL"},{side:"BUY",quantity:"1",entryPrice:"1",currency:"BRL"}]), /MISSING_SELL_LEG|MISSING_BUY_LEG/);
   assert.throws(() => calculateEquityPair([{...legs[0]!,currency:"USD"},legs[1]!]), /CURRENCY_MISMATCH/);
+  assert.throws(() => calculateEquityPair([{...legs[0]!,quantity:"0"},legs[1]!]), /INVALID_QUANTITY/);
+  assert.throws(() => calculateEquityPair([{...legs[0]!,entryPrice:"-1"},legs[1]!]), /INVALID_ENTRY_PRICE/);
+  const negative = calculateEquityPair([{...legs[0]!,quantity:"1",entryPrice:"1"},{...legs[1]!,quantity:"2",entryPrice:"2"}]);
+  assert.equal(negative.netExposure.value,"-3.00");
 });
