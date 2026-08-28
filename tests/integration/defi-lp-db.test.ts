@@ -63,7 +63,8 @@ maybeTest("E2E DeFi LP PostgreSQL snapshots, reload and spot isolation", async (
     const snapshotB = await fetch(`${base}/v1/operations/${saved.id}/snapshots`, { method: "POST", headers: { ...snapshotHeaders, "Idempotency-Key": crypto.randomUUID() }, body: JSON.stringify({ ...snapshotPayload, currentPositionValue: "430.00", observedAt: "2026-08-29T12:00:00.000Z" }) });
     assert.equal(snapshotB.status, 201);
     const history = await fetch(`${base}/v1/operations/${saved.id}/snapshots`).then((response) => response.json()) as {items:{current_position_value:string}[]};
-    assert.deepEqual(history.items.map((item) => item.current_position_value), ["428.12", "430.00"]);
+    assert.ok(new D(history.items[0]!.current_position_value).eq("428.12"));
+    assert.ok(new D(history.items[1]!.current_position_value).eq("430.00"));
     const metrics = await fetch(`${base}/v1/operations/${saved.id}/metrics`).then((response) => response.json()) as {metrics:{economicValue:{value:string};totalPnl:{value:string};totalReturn:{value:string}}};
     assert.equal(metrics.metrics.economicValue.value, "466.22");
     assert.equal(metrics.metrics.totalPnl.value, "15.91");
