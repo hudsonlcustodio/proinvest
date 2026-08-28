@@ -20,3 +20,8 @@ GAP-002: PTBR4 and SMIG3 remain unvalidated externally and are used only as user
 
 ## Futures
 Requires instrument-sourced contract metadata, exact round-trip P&L, closed persistence/reload, idempotency, regression goldens and PostgreSQL-backed E2E. B3 provenance is documented; WDOL26 execution is not externally claimed.
+
+## Crypto Spot
+Requires `CRYPTO_SPOT@1`, exact fractional precision beyond two decimals, BUY-only validation, BTC reference data, persistence/reload, idempotency and PostgreSQL-backed HTTP E2E.
+
+[GAP] `63000.38` is interpreted as USD/BTC unit price from the supplied fixture; no external price validation is claimed.
