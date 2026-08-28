@@ -1,12 +1,14 @@
 import { Router } from "express";
 import { calculateEquityHolding } from "../../../../packages/domain/src/equity-holding.js";
-import { createEquityHolding, getOperation, getPosition } from "../services/operation-service.js";
+import { calculateEquityPair } from "../../../../packages/domain/src/equity-pair.js";
+import { createEquityHolding, createEquityPair, getOperation, getPosition } from "../services/operation-service.js";
 
 export const operationsRouter = Router();
 
 operationsRouter.post("/preview", (req, res) => {
   try {
     const body = req.body;
+    if (body?.template?.type === "EQUITY_PAIR" && body?.template?.version === 1) return res.json({valid:true,metrics:calculateEquityPair(body.legs),warnings:[]});
     if (body?.template?.type !== "EQUITY_HOLDING" || body?.template?.version !== 1) {
       return res.status(422).json({type:"validation_error",status:422,code:"UNSUPPORTED_TEMPLATE"});
     }
@@ -40,6 +42,11 @@ operationsRouter.post("/", async (req, res, next) => {
     }
 
     const body=req.body;
+    if(body?.template?.type === "EQUITY_PAIR" && body?.template?.version === 1) {
+      try { calculateEquityPair(body.legs); } catch (error) { return res.status(422).json({type:"validation_error",status:422,code:error instanceof Error ? error.message : "INVALID_PAIR"}); }
+      const result = await createEquityPair({strategyId:body.strategyId,accountId:body.accountId,openedAt:body.openedAt,legs:body.legs},key);
+      return res.status(result.statusCode).json(result.body);
+    }
     if(body?.template?.type!=="EQUITY_HOLDING" || body?.template?.version!==1)
       return res.status(422).json({type:"validation_error",status:422,code:"UNSUPPORTED_TEMPLATE"});
     if(!Array.isArray(body.legs) || body.legs.length!==1 || !body.legs[0])

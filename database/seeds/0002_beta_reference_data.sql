@@ -9,3 +9,10 @@ VALUES
 ('20000000-0000-4000-8000-000000000001', 'EMBR3', 'Embraer ON', 'EQUITY', 'B3', 'BRL', 'ACTIVE'),
 ('20000000-0000-4000-8000-000000000002', 'OIBR3', 'Oi ON', 'EQUITY', 'B3', 'BRL', 'ACTIVE')
 ON CONFLICT (id) DO NOTHING;
+
+INSERT INTO instruments
+(id, symbol, name, asset_class, market, currency, status)
+VALUES
+('20000000-0000-4000-8000-000000000003', 'PTBR4', 'PTBR4 (acceptance fixture)', 'EQUITY', 'B3', 'BRL', 'ACTIVE'),
+('20000000-0000-4000-8000-000000000004', 'SMIG3', 'SMIG3 (acceptance fixture)', 'EQUITY', 'B3', 'BRL', 'ACTIVE')
+ON CONFLICT (id) DO NOTHING;

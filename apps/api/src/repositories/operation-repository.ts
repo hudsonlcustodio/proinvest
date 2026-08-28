@@ -13,6 +13,15 @@ export interface CreateEquityHoldingRecord {
   sourceType: "MANUAL";
 }
 
+export interface CreateEquityPairRecord { strategyId:string; accountId:string; openedAt:string; legs:Array<{instrumentId:string;side:"BUY"|"SELL";quantity:string;entryPrice:string;currency:string}>; sourceType:"MANUAL" }
+
+export async function insertEquityPair(db: PoolClient, input: CreateEquityPairRecord): Promise<string> {
+  const operationId = randomUUID();
+  await db.query(`INSERT INTO operations (id,strategy_id,account_id,template_type,template_version,operation_type,status,opened_at,source_type) VALUES ($1,$2,$3,'EQUITY_PAIR',1,'PAIR','OPEN',$4,$5)`, [operationId,input.strategyId,input.accountId,input.openedAt,input.sourceType]);
+  for (const leg of input.legs) await db.query(`INSERT INTO operation_legs (id,operation_id,instrument_id,side,quantity,entry_price,currency) VALUES ($1,$2,$3,$4,$5::numeric,$6::numeric,$7)`, [randomUUID(),operationId,leg.instrumentId,leg.side,leg.quantity,leg.entryPrice,leg.currency.toUpperCase()]);
+  return operationId;
+}
+
 export async function insertEquityHolding(
   db: PoolClient,
   input: CreateEquityHoldingRecord
@@ -60,6 +69,8 @@ export async function findOperationById(
     status: string;
     strategy_id: string;
     strategy_name: string;
+    template_type: string;
+    template_version: number;
     instrument_id: string;
     symbol: string;
     side: "BUY" | "SELL";
@@ -69,7 +80,7 @@ export async function findOperationById(
     opened_at: Date;
   }>(`
     SELECT
-      o.id, o.status, o.strategy_id, s.name AS strategy_name,
+      o.id, o.status, o.strategy_id, s.name AS strategy_name, o.template_type, o.template_version,
       l.instrument_id, i.symbol, l.side,
       l.quantity::text, l.entry_price::text, l.currency, o.opened_at
     FROM operations o
@@ -79,7 +90,9 @@ export async function findOperationById(
     WHERE o.id = $1
   `, [operationId]);
 
-  return result.rows[0] ?? null;
+  if (!result.rows[0]) return null;
+  const first = result.rows[0];
+  return { id:first.id, status:first.status, strategyId:first.strategy_id, strategyName:first.strategy_name, templateType:first.template_type, templateVersion:first.template_version, openedAt:first.opened_at, legs:result.rows.map((row) => ({ instrumentId:row.instrument_id, symbol:row.symbol, side:row.side, quantity:row.quantity, entryPrice:row.entry_price, currency:row.currency })) };
 }
 
 export async function findPosition(db: PoolClient, accountId: string, instrumentId: string) {

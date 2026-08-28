@@ -1,7 +1,8 @@
 import type { PoolClient } from "pg";
 import { calculateEquityHolding } from "../../../../packages/domain/src/equity-holding.js";
+import { calculateEquityPair } from "../../../../packages/domain/src/equity-pair.js";
 import { findStrategyById } from "../repositories/strategy-repository.js";
-import { insertEquityHolding, findOperationById, findPosition } from "../repositories/operation-repository.js";
+import { insertEquityHolding, insertEquityPair, findOperationById, findPosition } from "../repositories/operation-repository.js";
 import { withTransaction } from "../db/transaction.js";
 import {
   requestHash,
@@ -62,6 +63,21 @@ export async function createEquityHolding(
 
     await completeIdempotencyKey(client, idempotencyKey, 201, body, operationId);
     return { statusCode: 201, body };
+  });
+}
+
+export async function createEquityPair(command: {strategyId:string;accountId:string;openedAt:string;legs:Array<{instrumentId:string;side:"BUY"|"SELL";quantity:string;entryPrice:string;currency:string}>}, idempotencyKey:string) {
+  const metrics = calculateEquityPair(command.legs);
+  return withTransaction(async (client) => {
+    const reservation = await reserveIdempotencyKey(client,idempotencyKey,"POST:/v1/operations",requestHash(command));
+    if (reservation.state === "REPLAY") return {statusCode:reservation.status,body:reservation.body};
+    const strategy = await findStrategyById(client,command.strategyId);
+    if (!strategy || strategy.status !== "ACTIVE") throw new Error("STRATEGY_NOT_FOUND_OR_INACTIVE");
+    if (strategy.templateType !== "EQUITY_PAIR" || strategy.templateVersion !== 1) throw new Error("STRATEGY_TEMPLATE_MISMATCH");
+    const operationId = await insertEquityPair(client,{...command,sourceType:"MANUAL"});
+    const body = {id:operationId,status:"OPEN",strategy:{id:strategy.id,name:strategy.name},template:{type:"EQUITY_PAIR",version:1},metrics};
+    await completeIdempotencyKey(client,idempotencyKey,201,body,operationId);
+    return {statusCode:201,body};
   });
 }
 

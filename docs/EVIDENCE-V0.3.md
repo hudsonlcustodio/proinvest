@@ -30,3 +30,9 @@ No PASS is claimed before CI evidence exists.
 - Local golden cases: EMBR3 `150 × 38.23 = 5734.50` and OIBR3 `335 × 1.28 = 428.80` pass.
 - Local E2E is skipped without `TEST_DATABASE_URL`; no local PostgreSQL evidence is claimed.
 - No secrets or generated artifacts are included in the change.
+
+## V0.5 Multi-leg
+
+- Domain golden fixture covers Long & Short: long `3041.12`, short `2425.50`, gross `5466.62`, net `615.62` BRL.
+- HTTP/database E2E covers catalog resolution, preview, atomic save, idempotent retry, two-leg reload and PostgreSQL decimal representation.
+- `GAP-002`: PTBR4 and SMIG3 are not externally validated; they remain user-provided acceptance fixtures.
