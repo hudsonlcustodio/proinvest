@@ -77,3 +77,30 @@ Architecture source: `docs/ARCHITECTURE-PORTFOLIO-V1.md` and ADR-011..014.
 - PORT-ARCH-012: PASS — read-only security and denied capabilities are explicit.
 
 [DECISÃO] `GATE-PORTFOLIO-ARCH = PASS`. This gate approves architecture and contracts only. Portfolio implementation and delivery remain `NOT STARTED`.
+
+## Portfolio Implementation
+
+Evidence: GitHub Actions run `33220406046`, 28 passed, 0 failed, 0 skipped, including the dedicated Portfolio HTTP/PostgreSQL E2E.
+
+- PORT-IMP-001: PASS — classification policy implemented.
+- PORT-IMP-002: PASS — PositionKey includes Strategy.
+- PORT-IMP-003: PASS — equity pairs are excluded from holdings.
+- PORT-IMP-004: PASS — operation-scoped pair exposure implemented.
+- PORT-IMP-005: PASS — DeFi LP current position uses latest snapshot.
+- PORT-IMP-006: PASS — closed futures/derivatives are historical only.
+- PORT-IMP-007: PASS — AggregateMoneyMetric and coverage implemented.
+- PORT-IMP-008: PASS — missing values are never converted to zero.
+- PORT-IMP-009: PASS — per-currency buckets implemented.
+- PORT-IMP-010: PASS — cross-currency global is incomplete without FX.
+- PORT-IMP-011: PASS — valuation boundary exists with no cost-basis fallback.
+- PORT-IMP-012: PASS — operation/snapshot provenance is preserved.
+- PORT-IMP-013: PASS — `GET /v1/portfolio` implemented.
+- PORT-IMP-014: PASS — `GET /v1/portfolio/positions` implemented.
+- PORT-IMP-015: PASS — `GET /v1/portfolio/historical-results` implemented.
+- PORT-IMP-016: PASS — TEST-POS-001..012 are green.
+- PORT-IMP-017: PASS — PostgreSQL Portfolio E2E is green.
+- PORT-IMP-018: PASS — GOLDEN-001..007 remain green.
+- PORT-IMP-019: PASS — security review and audit are green.
+- PORT-IMP-020: PASS — complete GitHub Actions pipeline is green with zero skipped tests.
+
+[DECISÃO] `GATE-PORTFOLIO-IMPLEMENT = PASS`. This approves the read-only API/core; Portfolio dashboard remains not started.

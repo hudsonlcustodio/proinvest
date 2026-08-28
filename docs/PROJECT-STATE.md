@@ -1,7 +1,7 @@
 # PROJECT STATE — ProInvest
 
-Phase: ARCHITECTURE / V1.0 Portfolio & Analytics
-Baseline: PRD V1.0 (`b39e6283b5a5f57777b99bafe8c926a18d15ce0e`)
+Phase: IMPLEMENTATION / V1.0 Portfolio Core
+Baseline: Portfolio Architecture (`536bd48fcf032c7a379ba0868496b28d375a228f`)
 Architecture: modular monolith
 System of record: PostgreSQL
 External financial write: disabled
@@ -23,7 +23,7 @@ Golden cases: GOLDEN-001..007
 - DEFI-LP: PASS
 - PORTFOLIO-SPEC: PASS
 - PORTFOLIO-ARCH: PASS
-- PORTFOLIO-IMPLEMENT: NOT STARTED
+- PORTFOLIO-IMPLEMENT: PASS
 - PROD: NOT STARTED
 
 ## Gaps
@@ -63,3 +63,7 @@ Multi-leg `EQUITY_PAIR@1` implemented for the Long & Short strategy with atomic 
 ## V1.0 Portfolio & Analytics architecture
 
 `docs/ARCHITECTURE-PORTFOLIO-V1.md` freezes classify-before-aggregate, specialized holding/pair/LP aggregation, Strategy-aware PositionKey, separate historical results, aggregate coverage, currency buckets, valuation boundary, provenance and the proposed three-endpoint read API. ADR-011..014 are accepted. Portfolio implementation and delivery remain not started.
+
+## V1.0 Portfolio Core implementation
+
+The read-only Portfolio core implements explicit classification, Strategy-aware holdings, operation-scoped pair/LP positions, closed historical results, partial aggregate coverage, per-currency buckets, provenance and the three approved HTTP endpoints. It remains on-read with no Portfolio table/cache and no dashboard. `DEC-P-001`, `DEC-P-002` and `DEC-P-006` remain pending and do not block the core.

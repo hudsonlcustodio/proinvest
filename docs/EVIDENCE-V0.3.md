@@ -63,3 +63,12 @@ No PASS is claimed before CI evidence exists.
 - GOLDEN-007 preserves WBTC/SOL LP values `450.31`, `428.12` and `36.22 USD` separately.
 - Derived values are `positionValueDelta -22.19`, `economicValue 464.34`, `totalPnl 14.03` and `totalReturn 14.03 / 450.31`.
 - Snapshots are append-only; APR/APY and impermanent loss remain unavailable without reconciled period and component quantities.
+
+## V1.0 Portfolio Core
+
+- Explicit classification dispatches holdings, pair exposure, DeFi LP positions and closed historical results.
+- Position identity includes Strategy, account, kind and instrument for holdings.
+- Portfolio is derived on read; no Portfolio persistence/projection was introduced.
+- Aggregate metrics preserve known subtotal and coverage without treating missing valuation as zero.
+- PostgreSQL/HTTP acceptance implements TEST-POS-001..012 and cross-currency isolation.
+- GitHub Actions run `33220406046` passed dependency install, build, migration + rerun, seeds, 28 tests with 0 failures and 0 skips, dedicated Portfolio HTTP/PostgreSQL E2E and audit with 0 vulnerabilities.

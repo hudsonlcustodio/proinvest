@@ -122,7 +122,7 @@ export async function findPosition(db: PoolClient, accountId: string, instrument
            COALESCE(SUM(CASE WHEN l.side = 'BUY' THEN l.quantity * l.entry_price ELSE -l.quantity * l.entry_price END), 0)::text AS cost_basis,
            MAX(l.currency) AS currency
     FROM operations o JOIN operation_legs l ON l.operation_id = o.id
-    WHERE o.account_id = $1 AND l.instrument_id = $2 AND o.status = 'OPEN' AND o.template_type IN ('EQUITY_HOLDING','EQUITY_PAIR','CRYPTO_SPOT')
+    WHERE o.account_id = $1 AND l.instrument_id = $2 AND o.status = 'OPEN' AND o.template_type IN ('EQUITY_HOLDING','CRYPTO_SPOT')
   `, [accountId, instrumentId]);
   const row = result.rows[0];
   if (!row || row.currency === null) return null;
