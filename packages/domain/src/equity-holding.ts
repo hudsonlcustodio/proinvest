@@ -1,4 +1,4 @@
-import Decimal from "decimal.js";
+import { Decimal } from "decimal.js";
 import type { MoneyMetric } from "./metric-result.js";
 
 export interface EquityHoldingInput { quantity:string; entryPrice:string; currency:string }
