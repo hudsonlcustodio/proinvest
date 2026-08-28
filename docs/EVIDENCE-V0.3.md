@@ -71,4 +71,4 @@ No PASS is claimed before CI evidence exists.
 - Portfolio is derived on read; no Portfolio persistence/projection was introduced.
 - Aggregate metrics preserve known subtotal and coverage without treating missing valuation as zero.
 - PostgreSQL/HTTP acceptance implements TEST-POS-001..012 and cross-currency isolation.
-- Final implementation gate remains evidence-pending until the implementation PR CI executes all Portfolio tests with zero skips.
+- GitHub Actions run `33220406046` passed dependency install, build, migration + rerun, seeds, 28 tests with 0 failures and 0 skips, dedicated Portfolio HTTP/PostgreSQL E2E and audit with 0 vulnerabilities.
