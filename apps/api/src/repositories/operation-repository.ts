@@ -105,7 +105,7 @@ export async function findOperationById(
 
   if (!result.rows[0]) return null;
   const first = result.rows[0];
-  return { id:first.id, status:first.status, strategyId:first.strategy_id, strategyName:first.strategy_name, templateType:first.template_type, templateVersion:first.template_version, openedAt:first.opened_at, closedAt:first.closed_at, legs:result.rows.map((row) => ({ instrumentId:row.instrument_id, symbol:row.symbol, side:row.side, quantity:row.quantity, entryPrice:row.entry_price, exitPrice:row.exit_price, currency:row.currency, investedCapital:row.invested_capital, leverage:row.leverage, effectiveNotional:row.notional })) };
+  return { id:first.id, status:first.status, strategyId:first.strategy_id, strategyName:first.strategy_name, templateType:first.template_type, templateVersion:first.template_version, openedAt:first.opened_at, closedAt:first.closed_at, legs:result.rows.map((row) => { const leg={ instrumentId:row.instrument_id, symbol:row.symbol, side:row.side, quantity:row.quantity, entryPrice:row.entry_price, exitPrice:row.exit_price, currency:row.currency }; return first.template_type === "CRYPTO_DERIVATIVE" ? {...leg, investedCapital:row.invested_capital, leverage:row.leverage, effectiveNotional:row.notional} : leg; }) };
 }
 
 export async function findPosition(db: PoolClient, accountId: string, instrumentId: string) {
