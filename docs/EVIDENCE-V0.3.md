@@ -50,3 +50,10 @@ No PASS is claimed before CI evidence exists.
 - Market value and unrealized P&L remain `INCOMPLETE` without current valuation.
 - PostgreSQL/HTTP E2E covers catalog, preview, create, reload, precision, retry and conflict.
 - [GAP-DOC] This cumulative evidence file retains its historical V0.3 filename; normalization is deferred.
+
+## V0.8 Crypto Derivative
+
+- `CRYPTO_DERIVATIVE@1` records closed BUY/SELL operations with explicit invested capital, leverage and entry/exit prices.
+- The supplied short fixture preserves `100.00 × 50 × ((69358.32 - 59862.15) / 69358.32) = 684.57324225846300775451308509 USD`.
+- Net P&L remains `INCOMPLETE` with `MISSING_TRADING_COSTS`; derivatives do not contribute to spot position quantity.
+- [GAP] Exchange-specific liquidation, maintenance margin, funding and contract mechanics are not modeled.

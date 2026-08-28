@@ -25,3 +25,10 @@ Requires instrument-sourced contract metadata, exact round-trip P&L, closed pers
 Requires `CRYPTO_SPOT@1`, exact fractional precision beyond two decimals, BUY-only validation, BTC reference data, persistence/reload, idempotency and PostgreSQL-backed HTTP E2E.
 
 [GAP] `63000.38` is interpreted as USD/BTC unit price from the supplied fixture; no external price validation is claimed.
+
+## Crypto Derivative
+Requires `CRYPTO_DERIVATIVE@1`, explicit invested capital and leverage, exact Decimal sign semantics for BUY/SELL, closed operation persistence/reload, idempotency, PostgreSQL HTTP E2E and isolation from spot positions.
+
+[DECISÃO] V0.8 uses `investedCapital × leverage × underlying return` as the economic contract supplied for this slice.
+
+[GAP] Liquidation, maintenance margin, funding, exchange-specific rules and contract mechanics remain outside V0.8.
