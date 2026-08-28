@@ -1,7 +1,7 @@
 # PROJECT STATE — ProInvest
 
-Phase: SPECIFICATION / V1.0 Portfolio & Analytics
-Baseline: V0.9 (`6770a118fc8989fdb02374489acfa00b45a9b399`)
+Phase: ARCHITECTURE / V1.0 Portfolio & Analytics
+Baseline: PRD V1.0 (`b39e6283b5a5f57777b99bafe8c926a18d15ce0e`)
 Architecture: modular monolith
 System of record: PostgreSQL
 External financial write: disabled
@@ -22,6 +22,7 @@ Golden cases: GOLDEN-001..007
 - CRYPTO-DERIVATIVE: PASS
 - DEFI-LP: PASS
 - PORTFOLIO-SPEC: PASS
+- PORTFOLIO-ARCH: PASS
 - PORTFOLIO-IMPLEMENT: NOT STARTED
 - PROD: NOT STARTED
 
@@ -58,3 +59,7 @@ Multi-leg `EQUITY_PAIR@1` implemented for the Long & Short strategy with atomic 
 ## V1.0 Portfolio & Analytics specification
 
 `docs/PRD-PORTFOLIO-V1.md` defines Portfolio as a read-only on-read derived view, separates current positions from historical results, forbids implicit cross-currency totals, defines partial completeness and provenance, and establishes GOLDEN-001..007 acceptance requirements. No Portfolio production code, API, schema or UI has been implemented.
+
+## V1.0 Portfolio & Analytics architecture
+
+`docs/ARCHITECTURE-PORTFOLIO-V1.md` freezes classify-before-aggregate, specialized holding/pair/LP aggregation, Strategy-aware PositionKey, separate historical results, aggregate coverage, currency buckets, valuation boundary, provenance and the proposed three-endpoint read API. ADR-011..014 are accepted. Portfolio implementation and delivery remain not started.

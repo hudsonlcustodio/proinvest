@@ -58,3 +58,22 @@ Specification source: `docs/PRD-PORTFOLIO-V1.md`.
 - PORT-SPEC-012: PASS — security constraints and non-goals are explicit.
 
 [DECISÃO] `GATE-PORTFOLIO-SPEC = PASS`. This gate approves specification only. `GATE-PORTFOLIO-IMPLEMENT` and Portfolio delivery remain `NOT STARTED`.
+
+## Portfolio Architecture
+
+Architecture source: `docs/ARCHITECTURE-PORTFOLIO-V1.md` and ADR-011..014.
+
+- PORT-ARCH-001: PASS — classify-before-aggregate is formalized.
+- PORT-ARCH-002: PASS — Strategy-aware PositionKey is approved.
+- PORT-ARCH-003: PASS — holding, pair and LP aggregation are separated.
+- PORT-ARCH-004: PASS — current positions and historical results are separate models.
+- PORT-ARCH-005: PASS — AggregateMoneyMetric and coverage are approved.
+- PORT-ARCH-006: PASS — currency buckets forbid implicit FX.
+- PORT-ARCH-007: PASS — valuation read boundary and policy extensions are defined.
+- PORT-ARCH-008: PASS — minimal provenance references are defined.
+- PORT-ARCH-009: PASS — summary/positions/historical-results API decomposition is selected.
+- PORT-ARCH-010: PASS — TEST-POS-001..012 are defined.
+- PORT-ARCH-011: PASS — on-read aggregation and review triggers are explicit.
+- PORT-ARCH-012: PASS — read-only security and denied capabilities are explicit.
+
+[DECISÃO] `GATE-PORTFOLIO-ARCH = PASS`. This gate approves architecture and contracts only. Portfolio implementation and delivery remain `NOT STARTED`.
