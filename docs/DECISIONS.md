@@ -10,3 +10,7 @@
 - ADR-008 accepted — Read-only External Integrations
 - ADR-009 accepted — Versioned Boleta Templates
 - ADR-010 accepted — Derived Metrics Are Not User Truth
+- ADR-011 accepted — Classify Positions Before Aggregation
+- ADR-012 accepted — Portfolio On-Read Aggregation
+- ADR-013 accepted — Partial Aggregate Metrics and Coverage
+- ADR-014 accepted — Current Portfolio vs Historical Results

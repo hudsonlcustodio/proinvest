@@ -1,5 +1,17 @@
 # API V0.1
 
+## Portfolio V1 architecture contract — proposed, not implemented
+
+The approved candidate decomposition is:
+
+- `GET /v1/portfolio` — compact summary and currency buckets.
+- `GET /v1/portfolio/positions` — discriminated current holdings, pair exposures and DeFi LP positions with filters/cursor pagination.
+- `GET /v1/portfolio/historical-results` — closed futures and crypto-derivative results with filters/cursor pagination.
+
+These endpoints are architecture contracts only. They are not implemented by this documentation change. Their DTOs, completeness rules, provenance and security boundaries are defined in `ARCHITECTURE-PORTFOLIO-V1.md`.
+
+The existing `GET /v1/operations/position/:accountId/:instrumentId` is a legacy operation-position endpoint and is not the Portfolio V1 contract.
+
 ## GET /health
 Liveness da API.
 
