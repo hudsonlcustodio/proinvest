@@ -43,3 +43,10 @@ No PASS is claimed before CI evidence exists.
 - GOLDEN-004: WDOL26 SELL 10 contracts, 5336 → 5330, factor 10, price move 6, gross P&L 600.00 BRL.
 - Net P&L remains `INCOMPLETE` with `MISSING_TRADING_COSTS`.
 - Synthetic contract metadata test changes factor to 5 and gross P&L to 300.00 without calculator changes.
+
+## V0.7 Crypto Spot
+
+- GOLDEN-005 preserves `0.00031 × 63000.38 = 19.5301178 USD` without two-decimal rounding.
+- Market value and unrealized P&L remain `INCOMPLETE` without current valuation.
+- PostgreSQL/HTTP E2E covers catalog, preview, create, reload, precision, retry and conflict.
+- [GAP-DOC] This cumulative evidence file retains its historical V0.3 filename; normalization is deferred.
