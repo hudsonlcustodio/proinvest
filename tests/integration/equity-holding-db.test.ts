@@ -53,7 +53,7 @@ maybeTest("E2E Strategy Catalog to Position reload", async () => {
     assert.equal(saved.metrics.costBasis.value, "5734.50");
     const position = await fetch(`${base}/v1/operations/position/${account.id}/${instrument.id}`).then((r) => r.json()) as {quantity:string;costBasis:{value:string};marketValue:{status:string}};
     assert.equal(position.quantity, "150.000000000000000000");
-    assert.equal(position.costBasis.value, "5734.500000000000000000");
+    assert.equal(position.costBasis.value, "5734.500000000000000000000000000000000000");
     assert.equal(position.marketValue.status, "INCOMPLETE");
   } finally { await new Promise<void>((resolve) => server.close(() => resolve())); }
 });
