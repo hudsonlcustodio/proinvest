@@ -1,13 +1,17 @@
 import { Router } from "express";
 import { calculateEquityHolding } from "../../../../packages/domain/src/equity-holding.js";
 import { calculateEquityPair } from "../../../../packages/domain/src/equity-pair.js";
-import { createEquityHolding, createEquityPair, getOperation, getPosition } from "../services/operation-service.js";
+import { calculateFuturesRoundTrip } from "../../../../packages/domain/src/futures-round-trip.js";
+import { createEquityHolding, createEquityPair, createFuturesRoundTrip, getOperation, getPosition } from "../services/operation-service.js";
+import { pool } from "../db/pool.js";
+import { findFuturesInstrument } from "../repositories/operation-repository.js";
 
 export const operationsRouter = Router();
 
-operationsRouter.post("/preview", (req, res) => {
+operationsRouter.post("/preview", async (req, res) => {
   try {
     const body = req.body;
+    if (body?.template?.type === "FUTURES_ROUND_TRIP" && body?.template?.version === 1) { const instrument=await findFuturesInstrument(pool,body.instrumentId); if(!instrument||!instrument.contract_size||!instrument.quotation_basis) return res.status(422).json({type:"validation_error",status:422,code:"FUTURES_METADATA_MISSING"}); return res.json({valid:true,metrics:calculateFuturesRoundTrip({...body,instrument:{contractSize:instrument.contract_size,quotationBasis:instrument.quotation_basis,settlementCurrency:instrument.settlement_currency}}),warnings:[]}); }
     if (body?.template?.type === "EQUITY_PAIR" && body?.template?.version === 1) return res.json({valid:true,metrics:calculateEquityPair(body.legs),warnings:[]});
     if (body?.template?.type !== "EQUITY_HOLDING" || body?.template?.version !== 1) {
       return res.status(422).json({type:"validation_error",status:422,code:"UNSUPPORTED_TEMPLATE"});
@@ -42,6 +46,7 @@ operationsRouter.post("/", async (req, res, next) => {
     }
 
     const body=req.body;
+    if(body?.template?.type === "FUTURES_ROUND_TRIP" && body?.template?.version === 1) { const result=await createFuturesRoundTrip({strategyId:body.strategyId,accountId:body.accountId,instrumentId:body.instrumentId,openingSide:body.openingSide,contracts:body.contracts,entryPrice:body.entryPrice,exitPrice:body.exitPrice,currency:body.currency,openedAt:body.openedAt,closedAt:body.closedAt ?? body.openedAt},key); return res.status(result.statusCode).json(result.body); }
     if(body?.template?.type === "EQUITY_PAIR" && body?.template?.version === 1) {
       try { calculateEquityPair(body.legs); } catch (error) { return res.status(422).json({type:"validation_error",status:422,code:error instanceof Error ? error.message : "INVALID_PAIR"}); }
       const result = await createEquityPair({strategyId:body.strategyId,accountId:body.accountId,openedAt:body.openedAt,legs:body.legs},key);

@@ -36,3 +36,10 @@ No PASS is claimed before CI evidence exists.
 - Domain golden fixture covers Long & Short: long `3041.12`, short `2425.50`, gross `5466.62`, net `615.62` BRL.
 - HTTP/database E2E covers catalog resolution, preview, atomic save, idempotent retry, two-leg reload and PostgreSQL decimal representation.
 - `GAP-002`: PTBR4 and SMIG3 are not externally validated; they remain user-provided acceptance fixtures.
+
+## V0.6 Futures
+
+- WDO product metadata provenance: B3, verified 2026-08-28; source URL is documentation only.
+- GOLDEN-004: WDOL26 SELL 10 contracts, 5336 → 5330, factor 10, price move 6, gross P&L 600.00 BRL.
+- Net P&L remains `INCOMPLETE` with `MISSING_TRADING_COSTS`.
+- Synthetic contract metadata test changes factor to 5 and gross P&L to 300.00 without calculator changes.

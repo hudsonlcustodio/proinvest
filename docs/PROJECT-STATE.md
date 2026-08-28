@@ -35,3 +35,6 @@ Vertical slice implemented with DB-backed strategy/account/instrument catalog, f
 
 ## V0.5
 Multi-leg `EQUITY_PAIR@1` implemented for the Long & Short strategy with atomic two-leg persistence, idempotent creation, complete 1:N reload, exact exposure metrics and frontend extension. PTBR4/SMIG3 are acceptance fixtures only; external ticker validation remains open.
+
+## V0.6
+`FUTURES_ROUND_TRIP@1` implemented with DB-backed contract metadata, WDOL26 fixture, exact Decimal P&L, closed operation persistence/reload and Day Trade frontend flow. B3 provenance: product WDO, verified 2026-08-28, https://www.b3.com.br/en_us/products-and-services/trading/futures/mini-u-s-dollar-futures.htm. This provenance describes product characteristics, not execution of the supplied WDOL26 trade.

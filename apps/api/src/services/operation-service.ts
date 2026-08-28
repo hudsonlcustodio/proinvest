@@ -1,8 +1,9 @@
 import type { PoolClient } from "pg";
 import { calculateEquityHolding } from "../../../../packages/domain/src/equity-holding.js";
 import { calculateEquityPair } from "../../../../packages/domain/src/equity-pair.js";
+import { calculateFuturesRoundTrip } from "../../../../packages/domain/src/futures-round-trip.js";
 import { findStrategyById } from "../repositories/strategy-repository.js";
-import { insertEquityHolding, insertEquityPair, findOperationById, findPosition } from "../repositories/operation-repository.js";
+import { insertEquityHolding, insertEquityPair, insertFuturesRoundTrip, findFuturesInstrument, findOperationById, findPosition } from "../repositories/operation-repository.js";
 import { withTransaction } from "../db/transaction.js";
 import {
   requestHash,
@@ -80,6 +81,8 @@ export async function createEquityPair(command: {strategyId:string;accountId:str
     return {statusCode:201,body};
   });
 }
+
+export async function createFuturesRoundTrip(command:{strategyId:string;accountId:string;instrumentId:string;openingSide:"BUY"|"SELL";contracts:string;entryPrice:string;exitPrice:string;currency:string;openedAt:string;closedAt:string}, key:string) { return withTransaction(async (client)=>{const reservation=await reserveIdempotencyKey(client,key,"POST:/v1/operations",requestHash(command));if(reservation.state==="REPLAY")return {statusCode:reservation.status,body:reservation.body};const strategy=await findStrategyById(client,command.strategyId);if(!strategy||strategy.status!=="ACTIVE")throw new Error("STRATEGY_NOT_FOUND_OR_INACTIVE");if(strategy.templateType!=="FUTURES_ROUND_TRIP"||strategy.templateVersion!==1)throw new Error("STRATEGY_TEMPLATE_MISMATCH");const instrument=await findFuturesInstrument(client,command.instrumentId);if(!instrument||!instrument.contract_size||!instrument.quotation_basis)throw new Error("FUTURES_METADATA_MISSING");const metrics=calculateFuturesRoundTrip({instrument:{contractSize:instrument.contract_size,quotationBasis:instrument.quotation_basis,settlementCurrency:instrument.settlement_currency},openingSide:command.openingSide,contracts:command.contracts,entryPrice:command.entryPrice,exitPrice:command.exitPrice,currency:command.currency});const id=await insertFuturesRoundTrip(client,{...command,sourceType:"MANUAL"});const body={id,status:"CLOSED",strategy:{id:strategy.id,name:strategy.name},template:{type:"FUTURES_ROUND_TRIP",version:1},metrics};await completeIdempotencyKey(client,key,201,body,id);return {statusCode:201,body};}); }
 
 export async function getOperation(operationId: string) {
   return withTransaction((client) => findOperationById(client, operationId));

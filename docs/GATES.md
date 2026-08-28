@@ -17,3 +17,6 @@ Requires strategy reference, preview, exact decimal calculation, persistence con
 Requires `EQUITY_PAIR@1`, two-leg atomic persistence, complete reload, idempotency, currency safety, Long & Short golden evidence and a green PostgreSQL-backed pipeline.
 
 GAP-002: PTBR4 and SMIG3 remain unvalidated externally and are used only as user-provided acceptance fixtures.
+
+## Futures
+Requires instrument-sourced contract metadata, exact round-trip P&L, closed persistence/reload, idempotency, regression goldens and PostgreSQL-backed E2E. B3 provenance is documented; WDOL26 execution is not externally claimed.
