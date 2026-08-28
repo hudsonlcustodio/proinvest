@@ -1,6 +1,7 @@
 import express from "express";
 import { strategiesRouter } from "./routes/strategies.js";
 import { operationsRouter } from "./routes/operations.js";
+import { portfolioRouter } from "./routes/portfolio.js";
 
 export function createApp() {
   const app = express();
@@ -14,6 +15,7 @@ export function createApp() {
 
   app.use("/v1/strategies", strategiesRouter);
   app.use("/v1/operations", operationsRouter);
+  app.use("/v1/portfolio", portfolioRouter);
 
   app.use((error: unknown, _req: express.Request, res: express.Response, _next: express.NextFunction) => {
     console.error("request_failed", {

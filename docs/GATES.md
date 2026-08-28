@@ -77,3 +77,7 @@ Architecture source: `docs/ARCHITECTURE-PORTFOLIO-V1.md` and ADR-011..014.
 - PORT-ARCH-012: PASS — read-only security and denied capabilities are explicit.
 
 [DECISÃO] `GATE-PORTFOLIO-ARCH = PASS`. This gate approves architecture and contracts only. Portfolio implementation and delivery remain `NOT STARTED`.
+
+## Portfolio Implementation
+
+Implementation criteria `PORT-IMP-001..020` are present in the core and tests. Final `PASS` requires the GitHub Actions run for the implementation PR to prove PostgreSQL Portfolio E2E with zero skipped tests. Until that evidence exists, `GATE-PORTFOLIO-IMPLEMENT = EVIDENCE PENDING`.
