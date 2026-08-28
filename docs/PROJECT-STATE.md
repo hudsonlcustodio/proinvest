@@ -44,3 +44,6 @@ Multi-leg `EQUITY_PAIR@1` implemented for the Long & Short strategy with atomic 
 
 ## V0.8
 `CRYPTO_DERIVATIVE@1` records closed BUY/SELL crypto derivative operations using the supplied semantics: invested capital × leverage × underlying return. Inputs remain explicit in the operation leg; no quantity is invented or added to spot position. Exchange-specific liquidation, maintenance margin, funding and contract mechanics are not modeled.
+
+## V0.9
+`DEFI_LP@1` records an open WBTC/SOL LP entry and append-only valuation snapshots. `investedAmount`, `currentPositionValue` and `unclaimedFees` remain separate; economic value and total P&L are derived with Decimal. Pool protocol, chain, address, fee tier, APR/APY and impermanent loss remain incomplete because the supplied data does not identify them.

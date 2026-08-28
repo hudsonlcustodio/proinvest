@@ -32,3 +32,10 @@ Requires `CRYPTO_DERIVATIVE@1`, explicit invested capital and leverage, exact De
 [DECISÃO] V0.8 uses `investedCapital × leverage × underlying return` as the economic contract supplied for this slice.
 
 [GAP] Liquidation, maintenance margin, funding, exchange-specific rules and contract mechanics remain outside V0.8.
+
+## DeFi LP
+Requires `DEFI_LP@1`, separate WBTC/SOL component identity, distinct entry and valuation inputs, append-only snapshots, exact Decimal metrics, unknown-vs-zero semantics, spot isolation, idempotency and PostgreSQL HTTP E2E.
+
+[DECISÃO] `economicValue = currentPositionValue + unclaimedFees` and `totalPnl = economicValue - investedAmount`; unclaimed fees are not claimed cash flow.
+
+[GAP] The supplied 36-day period is not reconciled with the 2026-07-28 entry date, so no annualization is calculated. Missing component quantities prevent reliable impermanent-loss calculation. Protocol, chain, pool address and fee tier were not supplied.

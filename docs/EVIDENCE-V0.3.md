@@ -57,3 +57,9 @@ No PASS is claimed before CI evidence exists.
 - The supplied short fixture preserves `100.00 × 50 × ((69358.32 - 59862.15) / 69358.32) = 684.57324225846300775451308509 USD`.
 - Net P&L remains `INCOMPLETE` with `MISSING_TRADING_COSTS`; derivatives do not contribute to spot position quantity.
 - [GAP] Exchange-specific liquidation, maintenance margin, funding and contract mechanics are not modeled.
+
+## V0.9 DeFi LP
+
+- GOLDEN-007 preserves WBTC/SOL LP values `450.31`, `428.12` and `36.22 USD` separately.
+- Derived values are `positionValueDelta -22.19`, `economicValue 464.34`, `totalPnl 14.03` and `totalReturn 14.03 / 450.31`.
+- Snapshots are append-only; APR/APY and impermanent loss remain unavailable without reconciled period and component quantities.
