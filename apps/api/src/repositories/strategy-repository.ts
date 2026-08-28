@@ -13,7 +13,7 @@ export interface StrategyRecord {
   status: "ACTIVE" | "ARCHIVED";
 }
 
-export interface ReferenceRecord { id: string; name: string; symbol?: string; currency?: string }
+export interface ReferenceRecord { id: string; name: string; symbol?: string; currency?: string; productCode?: string|null; contractSize?: string|null; contractSizeCurrency?: string|null; quotationBasis?: string|null; quotationCurrency?: string|null; settlementCurrency?: string|null; minimumPriceIncrement?: string|null; standardLot?: string|null }
 
 export async function listAccounts(db: Queryable): Promise<ReferenceRecord[]> {
   const result = await db.query<{id:string;name:string}>(`SELECT id, name FROM accounts WHERE status = 'ACTIVE' ORDER BY name`);
@@ -21,8 +21,8 @@ export async function listAccounts(db: Queryable): Promise<ReferenceRecord[]> {
 }
 
 export async function listInstruments(db: Queryable): Promise<ReferenceRecord[]> {
-  const result = await db.query<{id:string;symbol:string;name:string|null;currency:string}>(`SELECT id, symbol, name, currency FROM instruments WHERE status = 'ACTIVE' ORDER BY symbol`);
-  return result.rows.map((row) => ({ id: row.id, name: row.name ?? row.symbol, symbol: row.symbol, currency: row.currency }));
+  const result = await db.query<{id:string;symbol:string;name:string|null;currency:string;product_code:string|null;contract_size:string|null;contract_size_currency:string|null;quotation_basis:string|null;quotation_currency:string|null;settlement_currency:string|null;minimum_price_increment:string|null;standard_lot:string|null}>(`SELECT id, symbol, name, currency, product_code, contract_size::text, contract_size_currency, quotation_basis::text, quotation_currency, settlement_currency, minimum_price_increment::text, standard_lot::text FROM instruments WHERE status = 'ACTIVE' ORDER BY symbol`);
+  return result.rows.map((row) => ({ id: row.id, name: row.name ?? row.symbol, symbol: row.symbol, currency: row.currency, productCode:row.product_code, contractSize:row.contract_size, contractSizeCurrency:row.contract_size_currency, quotationBasis:row.quotation_basis, quotationCurrency:row.quotation_currency, settlementCurrency:row.settlement_currency, minimumPriceIncrement:row.minimum_price_increment, standardLot:row.standard_lot }));
 }
 
 export async function listStrategies(db: Queryable): Promise<StrategyRecord[]> {
