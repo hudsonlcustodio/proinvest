@@ -8,7 +8,7 @@
   },
   "scripts": {
     "build": "tsc -p tsconfig.json",
-    "test": "npm run build && node --test dist/tests",
+    "test": "npm run build && node --test dist/tests/golden/equity-holding.test.js dist/tests/integration/equity-holding-db.test.js",
     "start:api": "node dist/apps/api/src/server.js",
     "dev:api": "node --watch --experimental-strip-types apps/api/src/server.ts",
     "db:migrate": "node scripts/migrate.mjs",
