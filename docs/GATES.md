@@ -39,3 +39,22 @@ Requires `DEFI_LP@1`, separate WBTC/SOL component identity, distinct entry and v
 [DECISÃO] `economicValue = currentPositionValue + unclaimedFees` and `totalPnl = economicValue - investedAmount`; unclaimed fees are not claimed cash flow.
 
 [GAP] The supplied 36-day period is not reconciled with the 2026-07-28 entry date, so no annualization is calculated. Missing component quantities prevent reliable impermanent-loss calculation. Protocol, chain, pool address and fee tier were not supplied.
+
+## Portfolio Specification
+
+Specification source: `docs/PRD-PORTFOLIO-V1.md`.
+
+- PORT-SPEC-001: PASS — current portfolio and historical results are separate.
+- PORT-SPEC-002: PASS — totals are bucketed by currency; implicit FX is forbidden.
+- PORT-SPEC-003: PASS — valuation and P&L concepts are distinct.
+- PORT-SPEC-004: PASS — unknown and zero remain distinct.
+- PORT-SPEC-005: PASS — spot, derivative, LP, pair and futures isolation is explicit.
+- PORT-SPEC-006: PASS — DeFi economic value counts known fees exactly once.
+- PORT-SPEC-007: PASS — partial completeness retains known subtotal and coverage.
+- PORT-SPEC-008: PASS — provenance requirements are defined.
+- PORT-SPEC-009: PASS — GOLDEN-001..007 are the acceptance dataset.
+- PORT-SPEC-010: PASS — candidate read-only API contract is proposed.
+- PORT-SPEC-011: PASS — measurable RNFs are defined.
+- PORT-SPEC-012: PASS — security constraints and non-goals are explicit.
+
+[DECISÃO] `GATE-PORTFOLIO-SPEC = PASS`. This gate approves specification only. `GATE-PORTFOLIO-IMPLEMENT` and Portfolio delivery remain `NOT STARTED`.

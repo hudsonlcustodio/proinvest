@@ -1,12 +1,12 @@
 # PROJECT STATE — ProInvest
 
-Phase: IMPLEMENTATION / Beta D14
-Baseline: v0.1
+Phase: SPECIFICATION / V1.0 Portfolio & Analytics
+Baseline: V0.9 (`6770a118fc8989fdb02374489acfa00b45a9b399`)
 Architecture: modular monolith
 System of record: PostgreSQL
 External financial write: disabled
-Current slice: Strategy Catalog → EQUITY_HOLDING@1 → Preview → Save → Reload → Position
-Golden cases: EMBR3, OIBR3
+Current scope: PRD V1.0 — Portfolio & Analytics (no production implementation)
+Golden cases: GOLDEN-001..007
 
 ## Gates
 - TRUTH: PASS
@@ -14,15 +14,22 @@ Golden cases: EMBR3, OIBR3
 - SPEC: PASS V0.1
 - ARCH: PASS V0.1
 - REPO-AUDIT: PASS
-- FOUNDATION: IMPLEMENTED / EVIDENCE PENDING
-- IMPLEMENT: OPEN
+- FOUNDATION: PASS
+- EQUITY-HOLDING: PASS
+- MULTI-LEG: PASS
+- FUTURES: PASS
+- CRYPTO-SPOT: PASS
+- CRYPTO-DERIVATIVE: PASS
+- DEFI-LP: PASS
+- PORTFOLIO-SPEC: PASS
+- PORTFOLIO-IMPLEMENT: NOT STARTED
 - PROD: NOT STARTED
 
 ## Gaps
-- Confirmar "Renda Fixa" + EMBR3.
-- Confirmar PTBR4 e SMIG3.
-- Confirmar semântica de fees LP.
-- Obter quantity/notional do BTC alavancado.
+- PTBR4 and SMIG3 remain user-provided fixtures without external ticker validation.
+- Portfolio base currency, staleness policy, partial-completeness response shape and endpoint decomposition remain pending decisions.
+- Equity/crypto spot current valuation storage/source is not implemented.
+- Crypto derivative quantity is intentionally not inferred from invested capital and leverage.
 
 ## V0.2
 Strategy read API and persistent EQUITY_HOLDING command implemented. Build, DB migration and integration evidence remain pending.
@@ -47,3 +54,7 @@ Multi-leg `EQUITY_PAIR@1` implemented for the Long & Short strategy with atomic 
 
 ## V0.9
 `DEFI_LP@1` records an open WBTC/SOL LP entry and append-only valuation snapshots. `investedAmount`, `currentPositionValue` and `unclaimedFees` remain separate; economic value and total P&L are derived with Decimal. Pool protocol, chain, address, fee tier, APR/APY and impermanent loss remain incomplete because the supplied data does not identify them.
+
+## V1.0 Portfolio & Analytics specification
+
+`docs/PRD-PORTFOLIO-V1.md` defines Portfolio as a read-only on-read derived view, separates current positions from historical results, forbids implicit cross-currency totals, defines partial completeness and provenance, and establishes GOLDEN-001..007 acceptance requirements. No Portfolio production code, API, schema or UI has been implemented.
