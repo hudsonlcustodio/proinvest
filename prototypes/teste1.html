@@ -1,0 +1,523 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard de Investimentos Pro</title>
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body class="bg-gray-100 font-sans text-gray-800 antialiased min-h-screen">
+
+    <header class="bg-slate-900 text-white p-4 flex items-center justify-between shadow-md sticky top-0 z-40">
+        <div class="flex items-center gap-3">
+            <button onclick="toggleMenu()" class="p-2 hover:bg-slate-800 rounded-lg transition focus:outline-none">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
+                </svg>
+            </button>
+            <h1 id="tituloPagina" class="text-lg font-bold tracking-wide">Página Inicial</h1>
+        </div>
+        <div class="text-right">
+            <span class="text-xs opacity-60 block">Patrimônio</span>
+            <span id="patrimonioTotalHeader" class="text-sm font-semibold text-emerald-400">R$ 0,00</span>
+        </div>
+    </header>
+
+    <div id="sidebar" class="fixed inset-y-0 left-0 w-64 bg-slate-950 text-slate-200 transform -translate-x-full transition-transform duration-300 ease-in-out z-50 shadow-2xl flex flex-col">
+        <div class="p-5 border-b border-slate-800 flex items-center justify-between">
+            <span class="font-black tracking-wider text-xl text-white">MENU</span>
+            <button onclick="toggleMenu()" class="text-slate-400 hover:text-white p-1 rounded-lg">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                </svg>
+            </button>
+        </div>
+        <nav class="flex-1 p-4 space-y-2 text-sm font-medium">
+            <button onclick="navegarPara('paginaInicial', 'Página Inicial')" class="w-full flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-slate-900 hover:text-white transition">🏠 Página Inicial</button>
+            <button onclick="navegarPara('novaBoleta', 'Nova Boleta')" class="w-full flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-slate-900 hover:text-white transition">🚀 Nova Boleta</button>
+            <button onclick="navegarPara('relatorios', 'Relatórios & Gráficos')" class="w-full flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-slate-900 hover:text-white transition">📊 Relatórios</button>
+            <button onclick="navegarPara('registros', 'Histórico de Registros')" class="w-full flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-slate-900 hover:text-white transition">📜 Registros</button>
+            <button onclick="navegarPara('configuracoes', 'Configurações do App')" class="w-full flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-slate-900 hover:text-white transition">🛠️ Configurações</button>
+        </nav>
+    </div>
+
+    <div id="overlay" onclick="toggleMenu()" class="fixed inset-0 bg-black/50 hidden z-40"></div>
+
+    <main class="max-w-xl mx-auto p-4 mt-2">
+
+        <section id="tela_paginaInicial" class="space-y-4 tab-content">
+            <div class="bg-gradient-to-br from-slate-800 to-slate-950 p-6 rounded-2xl shadow-lg text-white">
+                <span class="text-xs text-slate-400 font-semibold tracking-wider uppercase">Saldo Consolidado</span>
+                <h2 id="patrimonioCard" class="text-3xl font-black text-emerald-400 mt-1">R$ 0,00</h2>
+            </div>
+            <div class="bg-white p-5 rounded-2xl shadow-sm">
+                <h3 class="text-md font-bold text-gray-800 mb-3 border-b pb-2">💼 Minha Posição Atual</h3>
+                <div id="carteiraConsolidada" class="space-y-2.5 max-h-96 overflow-y-auto"></div>
+            </div>
+        </section>
+
+        <section id="tela_novaBoleta" class="bg-white p-6 rounded-2xl shadow-sm tab-content hidden">
+            <div class="mb-4">
+                <label class="block text-xs font-bold text-gray-500 uppercase">Selecione o Modelo de Boleta / Estratégia</label>
+                <select id="selectModeloBoletaAtiva" class="w-full mt-1 p-2.5 border border-gray-200 rounded-xl bg-slate-50 font-semibold text-sm focus:ring-2 focus:ring-blue-500" onchange="gerarBoletaDinamica()"></select>
+            </div>
+
+            <form id="investForm" class="space-y-4 border-t pt-4 border-gray-100">
+                <input type="hidden" id="editIndex" value="-1">
+                
+                <div>
+                    <label class="block text-xs font-bold text-gray-500 uppercase">Operação</label>
+                    <select id="tipo" class="w-full mt-1 p-2.5 border border-gray-200 rounded-xl bg-gray-50 text-sm" required>
+                        <option value="Compra">Compra</option>
+                        <option value="Venda">Venda</option>
+                        <option value="Provento">Provento</option>
+                    </select>
+                </div>
+
+                <div id="containerCamposBoleta" class="grid grid-cols-2 gap-3"></div>
+
+                <div class="flex gap-2 pt-2">
+                    <button type="button" id="btnCancelar" onclick="cancelarEdicao()" class="hidden w-1/3 bg-gray-200 text-gray-700 font-bold py-3 rounded-xl text-sm">Cancelar</button>
+                    <button type="submit" id="btnSalvar" class="flex-1 bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 rounded-xl text-sm transition shadow-md">⚡ Salvar Lançamento</button>
+                </div>
+            </form>
+        </section>
+
+        <section id="tela_relatorios" class="bg-white p-6 rounded-2xl shadow-sm tab-content hidden">
+            <h3 class="text-lg font-bold text-gray-800 mb-4">Alocação por Grupo</h3>
+            <div class="w-full h-64 flex justify-center items-center"><canvas id="chartInvestimentos"></canvas></div>
+        </section>
+
+        <section id="tela_registros" class="bg-white p-6 rounded-2xl shadow-sm tab-content hidden">
+            <h3 class="text-lg font-bold text-gray-800 mb-4">Extrato de Movimentações</h3>
+            <div id="listaTransacoes" class="space-y-2.5 max-h-[30rem] overflow-y-auto"></div>
+        </section>
+
+        <section id="tela_configuracoes" class="bg-white p-6 rounded-2xl shadow-sm tab-content hidden space-y-6">
+            <div>
+                <h3 class="text-md font-bold text-gray-800 mb-1">🛠️ Criar Boleta por Estratégia</h3>
+                <p class="text-xs text-gray-400 mb-4">Defina o nome da estratégia e quais campos estarão disponíveis na boleta de preenchimento.</p>
+                
+                <div class="space-y-4 p-4 bg-slate-50 rounded-2xl border border-slate-200">
+                    <div>
+                        <label class="block text-xs font-bold text-gray-600 uppercase">Nome da Boleta / Estratégia</label>
+                        <input type="text" id="nomeNovoModelo" placeholder="Ex: Swing Trade Alavancado, Dividendos" class="w-full mt-1 p-2.5 border border-gray-200 rounded-xl bg-white text-sm">
+                    </div>
+
+                    <div>
+                        <span class="block text-xs font-bold text-gray-600 uppercase mb-2">Campos de Informação Geral</span>
+                        <div class="grid grid-cols-2 gap-2 text-xs">
+                            <label class="flex items-center gap-2 bg-white p-2 rounded-lg border cursor-pointer"><input type="checkbox" id="chk_ativo" checked disabled> Ativo (Fixo)</label>
+                            <label class="flex items-center gap-2 bg-white p-2 rounded-lg border cursor-pointer"><input type="checkbox" id="chk_corretora"> Corretora</label>
+                            <label class="flex items-center gap-2 bg-white p-2 rounded-lg border cursor-pointer"><input type="checkbox" id="chk_carteira"> Carteira</label>
+                            <label class="flex items-center gap-2 bg-white p-2 rounded-lg border cursor-pointer"><input type="checkbox" id="chk_estrategia"> Estratégia</label>
+                            <label class="flex items-center gap-2 bg-white p-2 rounded-lg border cursor-pointer"><input type="checkbox" id="chk_grupo"> Grupo</label>
+                            <label class="flex items-center gap-2 bg-white p-2 rounded-lg border cursor-pointer"><input type="checkbox" id="chk_subgrupo"> Subgrupo</label>
+                        </div>
+                    </div>
+
+                    <div>
+                        <span class="block text-xs font-bold text-gray-600 uppercase mb-2">Campos Financeiros</span>
+                        <div class="grid grid-cols-2 gap-2 text-xs">
+                            <label class="flex items-center gap-2 bg-white p-2 rounded-lg border cursor-pointer"><input type="checkbox" id="chk_quantidade"> Quantidade</label>
+                            <label class="flex items-center gap-2 bg-white p-2 rounded-lg border cursor-pointer"><input type="checkbox" id="chk_valor"> Valor Total</label>
+                            <label class="flex items-center gap-2 bg-white p-2 rounded-lg border cursor-pointer"><input type="checkbox" id="chk_alavancagem"> Alavancagem</label>
+                            <label class="flex items-center gap-2 bg-white p-2 rounded-lg border cursor-pointer"><input type="checkbox" id="chk_preco_compra"> Preço Compra</label>
+                        </div>
+                    </div>
+
+                    <div class="border-t pt-3 border-gray-200">
+                        <label class="block text-xs font-bold text-gray-600 uppercase">Criar Novo Campo Customizado (Opcional)</label>
+                        <div class="grid grid-cols-5 gap-1.5 mt-1">
+                            <input type="text" id="campoExtraNome" placeholder="Ex: Prazo" class="col-span-3 p-2 border rounded-lg text-xs bg-white">
+                            <select id="campoExtraTipo" class="col-span-2 p-2 border rounded-lg text-xs bg-white">
+                                <option value="text">Texto</option>
+                                <option value="number">Número</option>
+                                <option value="date">Data</option>
+                            </select>
+                        </div>
+                        <button type="button" onclick="adicionarCampoTemporario()" class="mt-2 text-blue-600 hover:text-blue-800 text-xs font-bold">+ Vincular este campo ao modelo</button>
+                        <div id="listaCamposTemporarios" class="text-[10px] text-gray-500 mt-1 italic"></div>
+                    </div>
+
+                    <button onclick="salvarNovoModeloBoleta()" class="w-full bg-blue-600 hover:bg-blue-700 text-white text-sm py-2.5 rounded-xl font-bold transition">💾 Construir e Ativar Boleta</button>
+                </div>
+            </div>
+
+            <div>
+                <h4 class="text-xs font-bold text-gray-500 uppercase mb-2">Modelos de Estratégia Ativos:</h4>
+                <div id="containerListaModelos" class="space-y-1"></div>
+            </div>
+            
+            <div class="border-t pt-4">
+                <h4 class="text-sm font-bold text-red-600 mb-2">Zona de Perigo</h4>
+                <button onclick="limparTudo()" class="w-full bg-red-50 text-red-600 border border-red-200 hover:bg-red-100 text-xs py-2.5 rounded-xl font-semibold transition">⚠️ Apagar Todos os Dados</button>
+            </div>
+        </section>
+
+    </main>
+
+    <script>
+        let modelosBoletas = JSON.parse(localStorage.getItem('modelos_boletas_v5')) || {
+            "Cripto Avançado": { 
+                campos: ["ativo", "corretora", "grupo", "quantidade", "preco_compra"], 
+                extras: [] 
+            },
+            "Ações Padrão": { 
+                campos: ["ativo", "corretora", "grupo", "subgrupo", "quantidade", "preco_compra"], 
+                extras: [] 
+            }
+        };
+
+        let bancoDeDados = JSON.parse(localStorage.getItem('meus_investimentos_v5')) || [];
+        let camposExtrasTemporarios = []; 
+        let meuGrafico = null;
+
+        function toggleMenu() {
+            document.getElementById('sidebar').classList.toggle('-translate-x-full');
+            document.getElementById('overlay').classList.toggle('hidden');
+        }
+
+        function navegarPara(idTela, titulo) {
+            document.querySelectorAll('.tab-content').forEach(tela => tela.classList.add('hidden'));
+            document.getElementById(`tela_${idTela}`).classList.remove('hidden');
+            document.getElementById('tituloPagina').innerText = titulo;
+            document.getElementById('sidebar').classList.add('-translate-x-full');
+            document.getElementById('overlay').classList.add('hidden');
+            if(idTela === 'novaBoleta') atualizarSelectModelosExecucao();
+        }
+
+        function iniciar() {
+            atualizarSelectModelosExecucao();
+            renderizarModelosConfig();
+            renderizarApp();
+        }
+
+        function atualizarSelectModelosExecucao() {
+            const select = document.getElementById('selectModeloBoletaAtiva');
+            const chaves = Object.keys(modelosBoletas);
+            select.innerHTML = chaves.map(m => `<option value="${m}">${m}</option>`).join('');
+            gerarBoletaDinamica();
+        }
+
+        function adicionarCampoTemporario() {
+            const nome = document.getElementById('campoExtraNome').value.trim();
+            const tipo = document.getElementById('campoExtraTipo').value;
+            if(!nome) return alert("Digite o nome do campo.");
+            
+            camposExtrasTemporarios.push({ nome, tipo });
+            document.getElementById('campoExtraNome').value = '';
+            document.getElementById('listaCamposTemporarios').innerText = "Campos Extras adicionais: " + camposExtrasTemporarios.map(c => c.nome).join(', ');
+        }
+
+        function salvarNovoModeloBoleta() {
+            const nome = document.getElementById('nomeNovoModelo').value.trim();
+            if(!nome) return alert("Por favor, dê um nome para o modelo.");
+
+            let camposSelecionados = ["ativo"];
+            const mapeamentoCampos = ["corretora", "carteira", "estrategia", "grupo", "subgrupo", "quantidade", "valor", "alavancagem", "preco_compra"];
+            
+            mapeamentoCampos.forEach(c => {
+                if(document.getElementById(`chk_${c}`).checked) camposSelecionados.push(c);
+            });
+
+            modelosBoletas[nome] = {
+                campos: camposSelecionados,
+                extras: camposExtrasTemporarios
+            };
+
+            localStorage.setItem('modelos_boletas_v5', JSON.stringify(modelosBoletas));
+            
+            document.getElementById('nomeNovoModelo').value = '';
+            camposExtrasTemporarios = [];
+            document.getElementById('listaCamposTemporarios').innerText = '';
+            mapeamentoCampos.forEach(c => document.getElementById(`chk_${c}`).checked = false);
+
+            renderizarModelosConfig();
+            atualizarSelectModelosExecucao();
+            alert(`Modelo "${nome}" criado!`);
+        }
+
+        function renderizarModelosConfig() {
+            const cont = document.getElementById('containerListaModelos');
+            cont.innerHTML = '';
+            Object.keys(modelosBoletas).forEach(m => {
+                cont.innerHTML += `
+                    <div class="flex justify-between items-center text-xs bg-gray-50 p-2.5 rounded-xl border border-gray-200">
+                        <span>🚀 <strong>${m}</strong></span>
+                        <button onclick="deletarModelo('${m}')" class="text-red-500 font-bold hover:text-red-700">Remover</button>
+                    </div>
+                `;
+            });
+        }
+
+        function deletarModelo(nome) {
+            if(confirm(`Excluir o modelo "${nome}"?`)){
+                delete modelosBoletas[nome];
+                localStorage.setItem('modelos_boletas_v5', JSON.stringify(modelosBoletas));
+                renderizarModelosConfig();
+                atualizarSelectModelosExecucao();
+            }
+        }
+
+        function gerarBoletaDinamica() {
+            const modeloNome = document.getElementById('selectModeloBoletaAtiva').value;
+            const container = document.getElementById('containerCamposBoleta');
+            container.innerHTML = '';
+
+            if(!modeloNome || !modelosBoletas[modeloNome]) return;
+            const config = modelosBoletas[modeloNome];
+
+            // Dicionário de injeção HTML
+            const dicionario = {
+                ativo: { label: "Identidade do Ativo", placeholder: "Ex: BTC, PETR4", col: "col-span-2", tipo: "text", props: "" },
+                corretora: { label: "Corretora", placeholder: "Ex: Binance, XP", col: "col-span-1", tipo: "text", props: "" },
+                carteira: { label: "Carteira", placeholder: "Ex: Hold, Trading", col: "col-span-1", tipo: "text", props: "" },
+                estrategia: { label: "Estratégia", placeholder: "Ex: Long Term", col: "col-span-1", tipo: "text", props: "" },
+                grupo: { label: "Grupo", placeholder: "Ex: Cripto, Ações", col: "col-span-1", tipo: "text", props: "" },
+                subgrupo: { label: "Subgrupo", placeholder: "Ex: Altcoin, FII", col: "col-span-1", tipo: "text", props: "" },
+                
+                // AJUSTADO: Casas decimais estendidas para 12 dígitos (0,000000000000 a infinito)
+                quantidade: { 
+                    label: "Quantidade", 
+                    placeholder: "0.000000000000", 
+                    col: "col-span-1", 
+                    tipo: "number", 
+                    props: 'step="0.000000000001" min="0"' 
+                },
+                valor: { label: "Valor Total (R$)", placeholder: "0.00", col: "col-span-1", tipo: "number", props: 'step="any" min="0"' },
+                alavancagem: { label: "Alavancagem", placeholder: "Ex: 3x, Não", col: "col-span-1", tipo: "text", props: "" },
+                preco_compra: { label: "Preço Compra (R$)", placeholder: "0.00", col: "col-span-1", tipo: "number", props: 'step="any" min="0"' }
+            };
+
+            config.campos.forEach(c => {
+                const info = dicionario[c];
+                container.innerHTML += `
+                    <div class="${info.col}">
+                        <label class="block text-xs font-bold text-gray-500 uppercase">${info.label}</label>
+                        <input type="${info.tipo}" id="boleta_${c}" data-campo-universal="${c}" ${info.props} placeholder="${info.placeholder}" class="field-boleta-universal w-full mt-1 p-2.5 border border-gray-200 rounded-xl bg-gray-50 text-sm" ${c === 'ativo' ? 'required' : ''}>
+                    </div>
+                `;
+            });
+
+            if(config.extras) {
+                config.extras.forEach(ext => {
+                    const idSani = "extra_" + ext.nome.toLowerCase().replace(/[^a-z0-9]/g, "");
+                    container.innerHTML += `
+                        <div class="col-span-2">
+                            <label class="block text-xs font-bold text-gray-500 uppercase">${ext.nome}</label>
+                            <input type="${ext.tipo}" id="${idSani}" data-campo-extra-nome="${ext.nome}" class="field-boleta-extra w-full mt-1 p-2.5 border border-gray-200 rounded-xl bg-gray-50 text-sm">
+                        </div>
+                    `;
+                });
+            }
+        }
+
+        document.getElementById('investForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const editIndex = parseInt(document.getElementById('editIndex').value);
+            const modeloNome = document.getElementById('selectModeloBoletaAtiva').value;
+
+            let dadosLote = { modelo_boleta: modeloNome };
+            
+            document.querySelectorAll('.field-boleta-universal').forEach(input => {
+                const chave = input.getAttribute('data-campo-universal');
+                dadosLote[chave] = input.value;
+            });
+
+            let extras = {};
+            document.querySelectorAll('.field-boleta-extra').forEach(input => {
+                const chave = input.getAttribute('data-campo-extra-nome');
+                extras[chave] = input.value;
+            });
+            dadosLote["custom_meta"] = extras;
+
+            // Tratamento interno das 12 casas decimais para não perder a precisão do ponto flutuante
+            let qtdVal = dadosLote["quantidade"] ? parseFloat(dadosLote["quantidade"]) : 1;
+            let precoVal = parseFloat(dadosLote["preco_compra"]) || parseFloat(dadosLote["valor"]) || 0;
+            
+            dadosLote["total_calculado"] = dadosLote["valor"] ? parseFloat(dadosLote["valor"]) : (qtdVal * precoVal);
+            dadosLote["quantidade_calculada"] = qtdVal;
+            dadosLote["preco_calculado"] = precoVal;
+            dadosLote["grupo_calculado"] = dadosLote["grupo"] || "Outros";
+
+            if (editIndex === -1) {
+                bancoDeDados.push(dadosLote);
+            } else {
+                bancoDeDados[editIndex] = dadosLote;
+                cancelarEdicao();
+            }
+
+            localStorage.setItem('meus_investimentos_v5', JSON.stringify(bancoDeDados));
+            document.getElementById('investForm').reset();
+            gerarBoletaDinamica();
+            renderizarApp();
+            navegarPara('paginaInicial', 'Página Inicial');
+        });
+
+        function editarRegistro(index) {
+            const item = bancoDeDados[index];
+            document.getElementById('editIndex').value = index;
+            document.getElementById('selectModeloBoletaAtiva').value = item.modelo_boleta;
+            
+            gerarBoletaDinamica();
+
+            document.querySelectorAll('.field-boleta-universal').forEach(input => {
+                const chave = input.getAttribute('data-campo-universal');
+                if(item[chave] !== undefined) input.value = item[chave];
+            });
+
+            if(item.custom_meta) {
+                document.querySelectorAll('.field-boleta-extra').forEach(input => {
+                    const chave = input.getAttribute('data-campo-extra-nome');
+                    if(item.custom_meta[chave]) input.value = item.custom_meta[chave];
+                });
+            }
+
+            document.getElementById('tituloBoleta').innerText = "📝 Editando Registro";
+            document.getElementById('btnSalvar').innerText = "Atualizar Lançamento";
+            document.getElementById('btnCancelar').classList.remove('hidden');
+            navegarPara('novaBoleta', 'Nova Boleta');
+        }
+
+        function excluirRegistro(index) {
+            if(confirm("Deseja deletar este registro?")) {
+                bancoDeDados.splice(index, 1);
+                localStorage.setItem('meus_investimentos_v5', JSON.stringify(bancoDeDados));
+                renderizarApp();
+            }
+        }
+
+        function cancelarEdicao() {
+            document.getElementById('editIndex').value = "-1";
+            document.getElementById('tituloBoleta').innerText = "Lançamento Ágil";
+            document.getElementById('btnSalvar').innerText = "⚡ Salvar Lançamento";
+            document.getElementById('btnCancelar').classList.add('hidden');
+            document.getElementById('investForm').reset();
+            gerarBoletaDinamica();
+            navegarPara('registros', 'Histórico de Registros');
+        }
+
+        function limparTudo() {
+            if(confirm("Deletar tudo?")) {
+                localStorage.clear();
+                location.reload();
+            }
+        }
+
+        function renderizarApp() {
+            const lista = document.getElementById('listaTransacoes');
+            const listaConsolidada = document.getElementById('carteiraConsolidada');
+            lista.innerHTML = '';
+            listaConsolidada.innerHTML = '';
+
+            let totaisPorGrupo = {};
+            let AtivosConsolidados = {};
+            let patrimonioGlobal = 0;
+
+            bancoDeDados.forEach((item, index) => {
+                let grp = item.grupo_calculado;
+                if (!totaisPorGrupo[grp]) totaisPorGrupo[grp] = 0;
+                totaisPorGrupo[grp] += item.total_calculado;
+
+                let identity = item.ativo.toUpperCase();
+                if (!AtivosConsolidados[identity]) {
+                    AtivosConsolidados[identity] = { grupo: grp, subgrupo: item.subgrupo || 'Geral', qtd: 0, custoTotal: 0, metaExibir: item };
+                }
+
+                AtivosConsolidados[identity].qtd += item.quantidade_calculada;
+                AtivosConsolidados[identity].custoTotal += item.total_calculado;
+
+                // Tags visualização
+                let tagsHtml = `<span class="bg-slate-100 text-slate-600 px-1.5 py-0.5 rounded text-[10px] mr-1">Modelo: ${item.modelo_boleta}</span>`;
+                // Exibe frações sem arredondamento agressivo na tag do histórico
+                if(item.quantidade) tagsHtml += `<span class="bg-amber-50 text-amber-700 px-1.5 py-0.5 rounded text-[10px] mr-1">Qtd: ${parseFloat(item.quantidade)}</span>`;
+                
+                ["corretora", "carteira", "estrategia", "alavancagem"].forEach(lbl => {
+                    if(item[lbl]) tagsHtml += `<span class="bg-gray-100 text-gray-500 px-1.5 py-0.5 rounded text-[10px] mr-1">${lbl}: ${item[lbl]}</span>`;
+                });
+
+                const div = document.createElement('div');
+                div.className = "p-3.5 bg-gray-50 rounded-xl flex justify-between items-center border-l-4 border-emerald-500";
+                div.innerHTML = `
+                    <div>
+                        <span class="font-bold text-gray-800 block">${item.ativo}</span>
+                        <div class="flex flex-wrap gap-1 my-1">${tagsHtml}</div>
+                    </div>
+                    <div class="flex items-center gap-2">
+                        <div class="text-right">
+                            <span class="font-bold text-gray-700 block">R$ ${item.total_calculado.toFixed(2)}</span>
+                        </div>
+                        <button onclick="editarRegistro(${index})" class="p-1 text-gray-400 hover:text-gray-600">✏️</button>
+                        <button onclick="excluirRegistro(${index})" class="p-1 text-red-400 hover:text-red-600">🗑️</button>
+                    </div>
+                `;
+                lista.insertBefore(div, lista.firstChild);
+            });
+
+            // Consolidação da Identidade com tratamento fracionado
+            Object.keys(AtivosConsolidados).forEach(idAtivo => {
+                const data = AtivosConsolidados[idAtivo];
+                if (data.qtd <= 0 && data.custoTotal <= 0) return;
+                
+                patrimonioGlobal += data.custoTotal;
+                let subLabel = `${data.grupo} · ${data.subgrupo}`;
+                if(data.metaExibir.estrategia) subLabel += ` [Estratégia: ${data.metaExibir.estrategia}]`;
+
+                // Exibe as casas decimais necessárias (até 12) caso seja uma fração de ativo
+                let qtdFormatada = data.qtd.toLocaleString('pt-BR', { minimumFractionDigits: 0, maximumFractionDigits: 12 });
+
+                const divC = document.createElement('div');
+                divC.className = "p-3.5 bg-white border border-gray-100 rounded-xl flex justify-between items-center shadow-xs";
+                divC.innerHTML = `
+                    <div>
+                        <span class="font-bold text-slate-800 block">${idAtivo}</span>
+                        <span class="text-xs text-gray-400">${subLabel}</span>
+                    </div>
+                    <div class="text-right">
+                        <span class="font-bold text-slate-800 block">R$ ${data.custoTotal.toFixed(2)}</span>
+                        <span class="text-xs text-gray-400 font-mono">${qtdFormatada} un</span>
+                    </div>
+                `;
+                listaConsolidada.appendChild(divC);
+            });
+
+            document.getElementById('patrimonioTotalHeader').innerText = `R$ ${patrimonioGlobal.toFixed(2)}`;
+            document.getElementById('patrimonioCard').innerText = `R$ ${patrimonioGlobal.toFixed(2)}`;
+
+            if(lista.children.length === 0) lista.innerHTML = '<p class="text-center text-gray-400 text-xs py-8">Nenhum registro.</p>';
+            if(listaConsolidada.children.length === 0) listaConsolidada.innerHTML = '<p class="text-center text-gray-400 text-xs py-8">Carteira vazia.</p>';
+
+            atualizarGrafico(totaisPorGrupo);
+        }
+
+        function atualizarGrafico(totais) {
+            const ctx = document.getElementById('chartInvestimentos').getContext('2d');
+            if (meuGrafico) meuGrafico.destroy();
+            
+            const labelsFiltradas = Object.keys(totais).filter(k => totais[k] > 0);
+            const dadosFiltrados = labelsFiltradas.map(k => totais[k]);
+
+            meuGrafico = new Chart(ctx, {
+                type: 'doughnut',
+                data: {
+                    labels: labelsFiltradas,
+                    datasets: [{
+                        data: dadosFiltrados,
+                        backgroundColor: ['#0f172a', '#2563eb', '#10b981', '#f59e0b', '#8b5cf6'],
+                        borderWidth: 2
+                    }]
+                },
+                options: { 
+                    responsive: true, 
+                    maintainAspectRatio: false,
+                    plugins: { legend: { position: 'bottom' } }
+                }
+            });
+        }
+
+        window.onload = iniciar;
+    </script>
+</body>
+</html>

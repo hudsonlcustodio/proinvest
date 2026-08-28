@@ -1,0 +1,46 @@
+name: ci
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+
+jobs:
+  build-test:
+    runs-on: ubuntu-latest
+
+    services:
+      postgres:
+        image: postgres:18
+        env:
+          POSTGRES_USER: proinvest
+          POSTGRES_PASSWORD: proinvest
+          POSTGRES_DB: proinvest_test
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U proinvest -d proinvest_test"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+    env:
+      DATABASE_URL: postgresql://proinvest:proinvest@localhost:5432/proinvest_test
+      TEST_DATABASE_URL: postgresql://proinvest:proinvest@localhost:5432/proinvest_test
+
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "24"
+          cache: npm
+      - run: npm install
+      - run: npm run build
+      - run: npm run db:migrate
+      - run: npm run db:migrate
+      - run: npm run db:seed
+      - run: npm test
+      - run: npm audit --audit-level=high
