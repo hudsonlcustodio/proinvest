@@ -41,3 +41,6 @@ Multi-leg `EQUITY_PAIR@1` implemented for the Long & Short strategy with atomic 
 
 ## V0.7
 `CRYPTO_SPOT@1` implements a BUY-only BTC holding flow with arbitrary Decimal precision, canonical gross amount, operation-based persistence/position, idempotency and PostgreSQL HTTP E2E. The fixture value `63000.38` is treated as USD/BTC unit price supplied by the user and is not externally validated.
+
+## V0.8
+`CRYPTO_DERIVATIVE@1` records closed BUY/SELL crypto derivative operations using the supplied semantics: invested capital × leverage × underlying return. Inputs remain explicit in the operation leg; no quantity is invented or added to spot position. Exchange-specific liquidation, maintenance margin, funding and contract mechanics are not modeled.

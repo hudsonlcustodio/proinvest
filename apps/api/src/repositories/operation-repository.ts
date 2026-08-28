@@ -16,7 +16,9 @@ export interface CreateEquityHoldingRecord {
 export interface CreateEquityPairRecord { strategyId:string; accountId:string; openedAt:string; legs:Array<{instrumentId:string;side:"BUY"|"SELL";quantity:string;entryPrice:string;currency:string}>; sourceType:"MANUAL" }
 export interface FuturesRecord { strategyId:string; accountId:string; instrumentId:string; openingSide:"BUY"|"SELL"; contracts:string; entryPrice:string; exitPrice:string; currency:string; openedAt:string; closedAt:string; sourceType:"MANUAL" }
 export interface CryptoSpotRecord { strategyId:string; accountId:string; instrumentId:string; side:"BUY"; quantity:string; unitPrice:string; currency:string; openedAt:string; sourceType:"MANUAL" }
+export interface CryptoDerivativeRecord { strategyId:string; accountId:string; instrumentId:string; side:"BUY"|"SELL"; investedCapital:string; leverage:string; entryPrice:string; exitPrice:string; currency:string; openedAt:string; closedAt:string; effectiveNotional:string; sourceType:"MANUAL" }
 export async function insertCryptoSpot(db:PoolClient,input:CryptoSpotRecord):Promise<string>{const id=randomUUID();await db.query(`INSERT INTO operations (id,strategy_id,account_id,template_type,template_version,operation_type,status,opened_at,source_type) VALUES ($1,$2,$3,'CRYPTO_SPOT',1,'HOLDING','OPEN',$4,$5)`,[id,input.strategyId,input.accountId,input.openedAt,input.sourceType]);await db.query(`INSERT INTO operation_legs (id,operation_id,instrument_id,side,quantity,entry_price,currency) VALUES ($1,$2,$3,'BUY',$4::numeric,$5::numeric,$6)`,[randomUUID(),id,input.instrumentId,input.quantity,input.unitPrice,input.currency.toUpperCase()]);return id;}
+export async function insertCryptoDerivative(db:PoolClient,input:CryptoDerivativeRecord):Promise<string>{const id=randomUUID();await db.query(`INSERT INTO operations (id,strategy_id,account_id,template_type,template_version,operation_type,status,opened_at,closed_at,source_type) VALUES ($1,$2,$3,'CRYPTO_DERIVATIVE',1,'DERIVATIVE','CLOSED',$4,$5,$6)`,[id,input.strategyId,input.accountId,input.openedAt,input.closedAt,input.sourceType]);await db.query(`INSERT INTO operation_legs (id,operation_id,instrument_id,side,quantity,entry_price,exit_price,currency,leverage,notional,invested_capital) VALUES ($1,$2,$3,$4,NULL,$5::numeric,$6::numeric,$7,$8::numeric,$9::numeric,$10::numeric)`,[randomUUID(),id,input.instrumentId,input.side,input.entryPrice,input.exitPrice,input.currency.toUpperCase(),input.leverage,input.effectiveNotional,input.investedCapital]);return id;}
 type Queryable = Pick<PoolClient, "query">;
 export async function findFuturesInstrument(db: Queryable, id:string) { const r=await db.query<{contract_size:string|null;quotation_basis:string|null;settlement_currency:string;symbol:string}>(`SELECT contract_size::text, quotation_basis::text, settlement_currency, symbol FROM instruments WHERE id=$1 AND status='ACTIVE' AND asset_class='FUTURE'`,[id]); return r.rows[0] ?? null; }
 export async function insertFuturesRoundTrip(db: PoolClient,input:FuturesRecord):Promise<string>{const id=randomUUID(),leg=randomUUID();await db.query(`INSERT INTO operations (id,strategy_id,account_id,template_type,template_version,operation_type,status,opened_at,closed_at,source_type) VALUES ($1,$2,$3,'FUTURES_ROUND_TRIP',1,'ROUND_TRIP','CLOSED',$4,$5,$6)`,[id,input.strategyId,input.accountId,input.openedAt,input.closedAt,input.sourceType]);await db.query(`INSERT INTO operation_legs (id,operation_id,instrument_id,side,quantity,entry_price,exit_price,currency) VALUES ($1,$2,$3,$4,$5::numeric,$6::numeric,$7::numeric,$8)`,[leg,id,input.instrumentId,input.openingSide,input.contracts,input.entryPrice,input.exitPrice,input.currency.toUpperCase()]);return id;}
@@ -81,16 +83,19 @@ export async function findOperationById(
     instrument_id: string;
     symbol: string;
     side: "BUY" | "SELL";
-    quantity: string;
+    quantity: string | null;
     entry_price: string;
     exit_price: string | null;
     currency: string;
+    leverage: string | null;
+    notional: string | null;
+    invested_capital: string | null;
     opened_at: Date;
   }>(`
     SELECT
       o.id, o.status, o.strategy_id, s.name AS strategy_name, o.template_type, o.template_version, o.closed_at,
       l.instrument_id, i.symbol, l.side,
-      l.quantity::text, l.entry_price::text, l.exit_price::text, l.currency, o.opened_at
+      l.quantity::text, l.entry_price::text, l.exit_price::text, l.currency, l.leverage::text, l.notional::text, l.invested_capital::text, o.opened_at
     FROM operations o
     JOIN strategies s ON s.id = o.strategy_id
     JOIN operation_legs l ON l.operation_id = o.id
@@ -100,7 +105,7 @@ export async function findOperationById(
 
   if (!result.rows[0]) return null;
   const first = result.rows[0];
-  return { id:first.id, status:first.status, strategyId:first.strategy_id, strategyName:first.strategy_name, templateType:first.template_type, templateVersion:first.template_version, openedAt:first.opened_at, closedAt:first.closed_at, legs:result.rows.map((row) => ({ instrumentId:row.instrument_id, symbol:row.symbol, side:row.side, quantity:row.quantity, entryPrice:row.entry_price, exitPrice:row.exit_price, currency:row.currency })) };
+  return { id:first.id, status:first.status, strategyId:first.strategy_id, strategyName:first.strategy_name, templateType:first.template_type, templateVersion:first.template_version, openedAt:first.opened_at, closedAt:first.closed_at, legs:result.rows.map((row) => ({ instrumentId:row.instrument_id, symbol:row.symbol, side:row.side, quantity:row.quantity, entryPrice:row.entry_price, exitPrice:row.exit_price, currency:row.currency, investedCapital:row.invested_capital, leverage:row.leverage, effectiveNotional:row.notional })) };
 }
 
 export async function findPosition(db: PoolClient, accountId: string, instrumentId: string) {
@@ -109,7 +114,7 @@ export async function findPosition(db: PoolClient, accountId: string, instrument
            COALESCE(SUM(CASE WHEN l.side = 'BUY' THEN l.quantity * l.entry_price ELSE -l.quantity * l.entry_price END), 0)::text AS cost_basis,
            MAX(l.currency) AS currency
     FROM operations o JOIN operation_legs l ON l.operation_id = o.id
-    WHERE o.account_id = $1 AND l.instrument_id = $2 AND o.status = 'OPEN'
+    WHERE o.account_id = $1 AND l.instrument_id = $2 AND o.status = 'OPEN' AND o.template_type IN ('EQUITY_HOLDING','EQUITY_PAIR','CRYPTO_SPOT')
   `, [accountId, instrumentId]);
   const row = result.rows[0];
   if (!row || row.currency === null) return null;
