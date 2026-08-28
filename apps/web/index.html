@@ -1,0 +1,16 @@
+<!doctype html>
+<html lang="pt-BR">
+<head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>ProInvest — Position Builder</title>
+<style>body{font:16px system-ui;max-width:760px;margin:32px auto;padding:0 16px;color:#17202a}form{display:grid;gap:12px;max-width:520px}label{display:grid;gap:4px}input,select,button{font:inherit;padding:9px}button{cursor:pointer;background:#173b57;color:white;border:0;border-radius:4px}.card{padding:16px;background:#f2f5f7;border-radius:6px;margin-top:20px}code{white-space:pre-wrap} .muted{color:#52606d}</style></head>
+<body><h1>ProInvest</h1><p class="muted">Strategy Catalog → EQUITY_HOLDING@1 → Preview → Save → Reload → Position</p>
+<form id="holding-form"><label>Estratégia<select id="strategy" required></select></label><label>Conta<select id="account" required></select></label><label>Ativo<select id="instrument" required></select></label><label>Quantidade<input id="quantity" inputmode="decimal" value="150" required></label><label>Preço de entrada<input id="price" inputmode="decimal" value="38.23" required></label><label>Data de abertura<input id="openedAt" type="datetime-local" required></label><button type="button" id="preview">Preview</button><button type="submit">Salvar e recarregar posição</button></form>
+<div id="result" class="card" hidden></div>
+<script>
+const $=id=>document.getElementById(id), get=path=>fetch(path).then(r=>r.ok?r.json():Promise.reject(new Error('API '+r.status)));
+const render=(data, title)=>{$('result').hidden=false;$('result').innerHTML='<strong>'+title+'</strong><pre>'+JSON.stringify(data,null,2)+'</pre>';};
+async function load(){const [s,a,i]=await Promise.all([get('/v1/strategies'),get('/v1/strategies/accounts'),get('/v1/strategies/instruments')]); for(const x of s.items) $('strategy').add(new Option(x.name+' ('+x.code+')',x.id)); for(const x of a.items) $('account').add(new Option(x.name,x.id)); for(const x of i.items) $('instrument').add(new Option(x.symbol+' — '+x.name,x.id)); $('openedAt').value=new Date().toISOString().slice(0,16);}
+function payload(){const i=$('instrument').selectedOptions[0];return {strategyId:$('strategy').value,accountId:$('account').value,template:{type:'EQUITY_HOLDING',version:1},openedAt:new Date($('openedAt').value).toISOString(),legs:[{instrumentId:$('instrument').value,side:'BUY',quantity:$('quantity').value,entryPrice:$('price').value,currency:i.dataset.currency||'BRL'}]};}
+async function preview(){const r=await fetch('/v1/operations/preview',{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify(payload())});render(await r.json(),'Preview');}
+async function save(e){e.preventDefault();const p=payload(),r=await fetch('/v1/operations',{method:'POST',headers:{'content-type':'application/json','Idempotency-Key':crypto.randomUUID()},body:JSON.stringify(p)}),saved=await r.json();render(saved,'Salvo');if(r.ok){const pos=await get('/v1/operations/position/'+p.accountId+'/'+p.legs[0].instrumentId);render(pos,'Position após reload');}}
+$('preview').onclick=()=>preview().catch(e=>render({error:e.message},'Erro'));$('holding-form').onsubmit=e=>save(e).catch(x=>render({error:x.message},'Erro'));load().catch(e=>render({error:e.message},'Erro'));
+</script></body></html>

@@ -1,6 +1,6 @@
 import { Router } from "express";
 import { calculateEquityHolding } from "../../../../packages/domain/src/equity-holding.js";
-import { createEquityHolding, getOperation } from "../services/operation-service.js";
+import { createEquityHolding, getOperation, getPosition } from "../services/operation-service.js";
 
 export const operationsRouter = Router();
 
@@ -14,6 +14,7 @@ operationsRouter.post("/preview", (req, res) => {
       return res.status(422).json({type:"validation_error",status:422,code:"INVALID_LEGS"});
     }
     const leg = body.legs[0];
+    if (leg.side !== "BUY") return res.status(422).json({type:"validation_error",status:422,code:"UNSUPPORTED_OPERATION_SIDE"});
     return res.json({
       valid:true,
       metrics:calculateEquityHolding({
@@ -45,6 +46,7 @@ operationsRouter.post("/", async (req, res, next) => {
       return res.status(422).json({type:"validation_error",status:422,code:"INVALID_LEGS"});
 
     const leg=body.legs[0];
+    if (leg.side !== "BUY") return res.status(422).json({type:"validation_error",status:422,code:"UNSUPPORTED_OPERATION_SIDE"});
     const result=await createEquityHolding({
       strategyId:body.strategyId, accountId:body.accountId,
       instrumentId:leg.instrumentId, openedAt:body.openedAt,
@@ -68,6 +70,14 @@ operationsRouter.post("/", async (req, res, next) => {
     }
     next(error);
   }
+});
+
+operationsRouter.get("/position/:accountId/:instrumentId", async (req,res,next)=>{
+  try {
+    const position = await getPosition(req.params.accountId, req.params.instrumentId);
+    if (!position) return res.status(404).json({type:"not_found",status:404,code:"POSITION_NOT_FOUND"});
+    return res.json(position);
+  } catch (error) { next(error); }
 });
 
 operationsRouter.get("/:id", async (req,res,next)=>{

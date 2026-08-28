@@ -28,3 +28,32 @@ maybeTest("PostgreSQL preserves exact financial decimal strings", async () => {
     await client.end();
   }
 });
+
+maybeTest("E2E Strategy Catalog to Position reload", async () => {
+  const { createApp } = await import("../../apps/api/src/app.js");
+  const server = createApp().listen(0);
+  try {
+    const address = server.address();
+    assert.ok(address && typeof address !== "string");
+    const base = `http://127.0.0.1:${address.port}`;
+    const strategies = await fetch(`${base}/v1/strategies`).then((r) => r.json()) as {items:{id:string;templateType:string}[]};
+    const strategy = strategies.items.find((item) => item.templateType === "EQUITY_HOLDING");
+    assert.ok(strategy);
+    const accounts = await fetch(`${base}/v1/strategies/accounts`).then((r) => r.json()) as {items:{id:string}[]};
+    const instruments = await fetch(`${base}/v1/strategies/instruments`).then((r) => r.json()) as {items:{id:string;symbol:string}[]};
+    const account = accounts.items[0];
+    const instrument = instruments.items.find((item) => item.symbol === "EMBR3");
+    assert.ok(account && instrument);
+    const payload = { strategyId: strategy.id, accountId: account.id, template: {type:"EQUITY_HOLDING",version:1}, openedAt:"2026-01-01T10:00:00.000Z", legs:[{instrumentId:instrument.id,side:"BUY",quantity:"150",entryPrice:"38.23",currency:"BRL"}] };
+    const preview = await fetch(`${base}/v1/operations/preview`, {method:"POST",headers:{"content-type":"application/json"},body:JSON.stringify(payload)}).then((r) => r.json()) as {metrics:{grossAmount:{value:string}}};
+    assert.equal(preview.metrics.grossAmount.value, "5734.50");
+    const savedResponse = await fetch(`${base}/v1/operations`, {method:"POST",headers:{"content-type":"application/json","Idempotency-Key":"00000000-0000-4000-8000-000000000099"},body:JSON.stringify(payload)});
+    assert.equal(savedResponse.status, 201);
+    const saved = await savedResponse.json() as {id:string;metrics:{costBasis:{value:string}}};
+    assert.equal(saved.metrics.costBasis.value, "5734.50");
+    const position = await fetch(`${base}/v1/operations/position/${account.id}/${instrument.id}`).then((r) => r.json()) as {quantity:string;costBasis:{value:string};marketValue:{status:string}};
+    assert.equal(position.quantity, "150.0000000000000000");
+    assert.equal(position.costBasis.value, "5734.5000000000000000");
+    assert.equal(position.marketValue.status, "INCOMPLETE");
+  } finally { await new Promise<void>((resolve) => server.close(() => resolve())); }
+});

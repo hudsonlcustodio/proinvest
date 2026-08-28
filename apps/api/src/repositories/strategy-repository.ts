@@ -13,6 +13,18 @@ export interface StrategyRecord {
   status: "ACTIVE" | "ARCHIVED";
 }
 
+export interface ReferenceRecord { id: string; name: string; symbol?: string; currency?: string }
+
+export async function listAccounts(db: Queryable): Promise<ReferenceRecord[]> {
+  const result = await db.query<{id:string;name:string}>(`SELECT id, name FROM accounts WHERE status = 'ACTIVE' ORDER BY name`);
+  return result.rows;
+}
+
+export async function listInstruments(db: Queryable): Promise<ReferenceRecord[]> {
+  const result = await db.query<{id:string;symbol:string;name:string|null;currency:string}>(`SELECT id, symbol, name, currency FROM instruments WHERE status = 'ACTIVE' ORDER BY symbol`);
+  return result.rows.map((row) => ({ id: row.id, name: row.name ?? row.symbol, symbol: row.symbol, currency: row.currency }));
+}
+
 export async function listStrategies(db: Queryable): Promise<StrategyRecord[]> {
   const result = await db.query<{
     id: string;

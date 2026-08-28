@@ -5,7 +5,7 @@ Baseline: v0.1
 Architecture: modular monolith
 System of record: PostgreSQL
 External financial write: disabled
-Current slice: Strategy → Equity Holding → Operation → Position
+Current slice: Strategy Catalog → EQUITY_HOLDING@1 → Preview → Save → Reload → Position
 Golden cases: EMBR3, OIBR3
 
 ## Gates
@@ -29,3 +29,6 @@ Strategy read API and persistent EQUITY_HOLDING command implemented. Build, DB m
 
 ## V0.3
 Migration tracking, idempotency, reload and PostgreSQL CI integration implemented. Runtime evidence remains pending.
+
+## V0.4
+Vertical slice implemented with DB-backed strategy/account/instrument catalog, functional web form, exact-decimal preview/save/reload and position reconstruction derived from operations. No trade/withdraw/transfer flows were added. End-to-end evidence is provided by GitHub Actions; local integration tests require PostgreSQL.

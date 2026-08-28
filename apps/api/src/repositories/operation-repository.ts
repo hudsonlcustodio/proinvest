@@ -81,3 +81,19 @@ export async function findOperationById(
 
   return result.rows[0] ?? null;
 }
+
+export async function findPosition(db: PoolClient, accountId: string, instrumentId: string) {
+  const result = await db.query<{quantity:string;cost_basis:string;currency:string|null}>(`
+    SELECT COALESCE(SUM(CASE WHEN l.side = 'BUY' THEN l.quantity ELSE -l.quantity END), 0)::text AS quantity,
+           COALESCE(SUM(CASE WHEN l.side = 'BUY' THEN l.quantity * l.entry_price ELSE -l.quantity * l.entry_price END), 0)::text AS cost_basis,
+           MAX(l.currency) AS currency
+    FROM operations o JOIN operation_legs l ON l.operation_id = o.id
+    WHERE o.account_id = $1 AND l.instrument_id = $2 AND o.status = 'OPEN'
+  `, [accountId, instrumentId]);
+  const row = result.rows[0];
+  if (!row || row.currency === null) return null;
+  return { accountId, instrumentId, quantity: row.quantity,
+    costBasis: { status: "AVAILABLE" as const, value: row.cost_basis, currency: row.currency },
+    marketValue: { status: "INCOMPLETE" as const, value: null, reason: "MISSING_CURRENT_VALUATION" },
+    unrealizedPnl: { status: "INCOMPLETE" as const, value: null, reason: "MISSING_CURRENT_VALUATION" } };
+}

@@ -1,7 +1,7 @@
 import type { PoolClient } from "pg";
 import { calculateEquityHolding } from "../../../../packages/domain/src/equity-holding.js";
 import { findStrategyById } from "../repositories/strategy-repository.js";
-import { insertEquityHolding, findOperationById } from "../repositories/operation-repository.js";
+import { insertEquityHolding, findOperationById, findPosition } from "../repositories/operation-repository.js";
 import { withTransaction } from "../db/transaction.js";
 import {
   requestHash,
@@ -67,4 +67,8 @@ export async function createEquityHolding(
 
 export async function getOperation(operationId: string) {
   return withTransaction((client) => findOperationById(client, operationId));
+}
+
+export async function getPosition(accountId: string, instrumentId: string) {
+  return withTransaction((client) => findPosition(client, accountId, instrumentId));
 }
