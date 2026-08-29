@@ -2,11 +2,36 @@
 
 ## V1.2 gates
 
-- `GATE-PORTFOLIO-INTELLIGENCE`: IN PROGRESS. INT-001..016 implemented locally; browser QA with active PostgreSQL and CI remain.
+- `GATE-PORTFOLIO-INTELLIGENCE`: PASS. PostgreSQL 18 browser QA, full regression and Actions run `33270737913` are green.
 - `GATE-CONNECTIONS-CORE`: NOT STARTED.
 - `GATE-CONNECTIONS-LIVE`: PENDING_PROVIDER_SELECTION; no provider is approved.
 - `GATE-V1.2-INTELLIGENCE-BETA`: NOT STARTED.
 - `GATE-PROD-PUBLIC`: OUT OF SCOPE.
+
+## Portfolio Intelligence
+
+Evidence: local PostgreSQL 18 regression on 2026-08-29 (36 server/domain/database tests and 11 frontend tests, 0 failed, 0 skipped), desktop/tablet/mobile browser QA against the real API, and GitHub Actions run `33270737913`.
+
+- INT-001: PASS — Dashboard is the macro entry point and Portfolio remains the current/historical drill-down.
+- INT-002: PASS — BRL and USD stay in separate value and allocation buckets.
+- INT-003: PASS — no global total is fabricated without explicit FX.
+- INT-004: PASS — Strategy allocations preserve identity and expose catalog names rather than UUIDs.
+- INT-005: PASS — position-kind allocation is separate from Strategy allocation.
+- INT-006: PASS — known value and valuation coverage are reported together.
+- INT-007: PASS — missing valuation is explicit and never converted to zero.
+- INT-008: PASS — portfolio health reports available and missing valuations.
+- INT-009: PASS — missing-valuation insight is deterministic and evidenced.
+- INT-010: PASS — missing-FX insight is deterministic and currency-safe.
+- INT-011: PASS — leveraged exposure insight is descriptive and never trade advice.
+- INT-012: PASS — largest known Strategy insight is scoped per currency and carries provenance.
+- INT-013: PASS — insights contain evidence, review destination and provenance references.
+- INT-014: PASS — BUY/SELL recommendation language is prohibited by regression.
+- INT-015: PASS — valuation snapshots use the append-only PostgreSQL boundary.
+- INT-016: PASS — fewer than two real snapshots renders `INSUFFICIENT_HISTORY`; no point is fabricated.
+- INT-017: PASS — Dashboard, Analytics and Insights pass desktop, tablet, mobile and navigation/accessibility browser QA.
+- INT-018: PASS — full PostgreSQL 18 and frontend regression is green locally and in CI with zero skips.
+
+[DECISÃO] `GATE-PORTFOLIO-INTELLIGENCE = PASS`. Connections and public production remain outside this gate.
 
 ## Foundation
 Requires repository structure, build, migrations, tests, CI and no committed secrets.
