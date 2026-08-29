@@ -1,6 +1,6 @@
 # ProInvest
 
-Baseline de implementação `v0.1`.
+Portfolio e registro manual de operações com domínio financeiro exato, API Express/PostgreSQL e SPA React dark-first.
 
 Primeiro vertical slice: `Strategy → EQUITY_HOLDING → Operation → Position → Golden Tests`.
 
@@ -12,14 +12,19 @@ Primeiro vertical slice: `Strategy → EQUITY_HOLDING → Operation → Position
 ## Bootstrap
 ```bash
 cp .env.example .env
-npm install
+npm ci
+npm run db:migrate
+npm run db:seed
 npm test
-npm run dev:api
+npm run build
+npm run start:api
 ```
 
 O primeiro `npm install` gera `package-lock.json`. Valide e versione o lockfile; depois troque o CI para `npm ci`.
 
-## API inicial
+Abra `http://localhost:3000/`; Portfolio é a entrada principal. Para desenvolvimento separado, execute `npm run dev:api` e `npm run dev:web` em terminais distintos.
+
+## API
 - `GET /health`
 - `POST /v1/operations/preview`
 

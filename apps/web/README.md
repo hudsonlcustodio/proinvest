@@ -1,4 +1,4 @@
 # Web
-Frontend será implementado incrementalmente.
-Primeiro fluxo: Strategy → EQUITY_HOLDING → Preview → Save → Operation Detail.
-O HTML original fica em `/prototypes` como referência, não como implementação final.
+Diretório legado preservado somente para comparação histórica durante a migração V1.1.
+
+A experiência canônica é a SPA em `apps/web-app`; estes HTMLs não são servidos pela API.
