@@ -44,6 +44,16 @@ Mobile is a single-column information model with a drawer, stacked summary, hori
 
 Prefer reviewed local primitives. Adopt registry code only after license/dependency review and record it in `docs/UI-COMPONENT-PROVENANCE.md`. No chart without real series data.
 
+## Signature Components
+
+- **Global command:** provides navigation from the app shell only. It must retain dialog/listbox semantics, full keyboard operation, Escape close and visible focus. It must not trigger financial writes or become a decorative launcher.
+- **Portfolio segmented tabs:** separate Current from Historical only. They must retain tab/tabpanel relationships and arrow-key navigation. Animation is limited to the 180ms active indicator and may never obscure which time perspective is selected.
+- **Mobile navigation drawer:** replaces desktop navigation below the responsive breakpoint. It requires touch-sized controls, focus trap, Escape close and trigger-focus restoration. It must not be used as a generic content carousel.
+- **Currency focus and coverage:** currency focus may orient attention without converting or hiding buckets; coverage must expose known value, available/total components, status and reason in text. Neither may synthesize totals, FX, progress or data.
+- **Provenance disclosure:** keeps source IDs secondary in native progressive disclosure. It is allowed on metrics and records with real source identifiers and forbidden for fabricated attribution.
+
+All signature motion follows intensity 3/10, lasts 120–180ms, serves orientation/feedback/state change and collapses under `prefers-reduced-motion`.
+
 ## Forbidden patterns
 
 No neon, rainbow gradient, heavy glass, exchange speculation motifs, decorative finance animation, fake totals/data/charts, client-side financial calculation, multiple icon systems, CSS-in-JS, microfrontends, secrets, wallet/order/withdraw/transfer/signing capability, or user content rendered as raw HTML.
