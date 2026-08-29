@@ -3,6 +3,7 @@ import path from "node:path";
 import { strategiesRouter } from "./routes/strategies.js";
 import { operationsRouter } from "./routes/operations.js";
 import { portfolioRouter } from "./routes/portfolio.js";
+import { dashboardRouter } from "./routes/dashboard.js";
 
 export function createApp() {
   const app = express();
@@ -28,8 +29,9 @@ export function createApp() {
   app.use("/v1/strategies", strategiesRouter);
   app.use("/v1/operations", operationsRouter);
   app.use("/v1/portfolio", portfolioRouter);
+  app.use("/v1/dashboard", dashboardRouter);
 
-  app.get(["/portfolio", "/operations/{*route}"], (_req, res) => {
+  app.get(["/dashboard","/analytics","/insights","/connections","/sync","/reconciliation","/portfolio", "/operations/{*route}"], (_req, res) => {
     res.sendFile(path.resolve("apps/web-dist/index.html"));
   });
 

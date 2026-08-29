@@ -54,6 +54,10 @@ Prefer reviewed local primitives. Adopt registry code only after license/depende
 
 All signature motion follows intensity 3/10, lasts 120–180ms, serves orientation/feedback/state change and collapses under `prefers-reduced-motion`.
 
+## Intelligence surfaces
+
+Dashboard is the macro home; Portfolio remains drill-down. Executive values are grouped by currency and always say “known value”. Allocation uses structured lists with textual percentages and coverage instead of decorative charts while canonical history is insufficient. Analytics expands the same server-owned metrics. Insights use quiet severity labels, evidence, review destinations and no trading instruction.
+
 ## Forbidden patterns
 
 No neon, rainbow gradient, heavy glass, exchange speculation motifs, decorative finance animation, fake totals/data/charts, client-side financial calculation, multiple icon systems, CSS-in-JS, microfrontends, secrets, wallet/order/withdraw/transfer/signing capability, or user content rendered as raw HTML.

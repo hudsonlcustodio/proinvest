@@ -13,3 +13,5 @@ ProInvest uses packages distributed under their respective licenses. Exact resol
 - Rolldown Windows binding — Rolldown contributors — MIT.
 
 No Kokonut UI, React Bits, Magic UI or Bklit source code is incorporated. Kokonut UI patterns informed local command, tab and drawer primitives; no registry component was copied verbatim. Magic UI, React Bits and Bklit were evaluated and rejected. See `docs/UI-COMPONENT-PROVENANCE.md`.
+
+No Bklit or chart-library code is incorporated in V1.2 Wave A; accessible local structured views were selected because current canonical data does not yet justify a time-series chart dependency.

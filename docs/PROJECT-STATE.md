@@ -1,5 +1,7 @@
 # PROJECT STATE — ProInvest
 
+Wave A V1.2 is in progress on `v1.2-portfolio-intelligence`: executable PRD, architecture, typed Dashboard/Analytics/Insights query model, deterministic rules and append-only valuation history. No provider, FX, valuation or history is fabricated.
+
 Phase: V1.1 VISUAL SYSTEM COMPLETE
 Baseline: Portfolio Architecture (`536bd48fcf032c7a379ba0868496b28d375a228f`)
 Architecture: modular monolith

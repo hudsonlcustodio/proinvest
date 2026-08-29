@@ -1,5 +1,13 @@
 # Gates
 
+## V1.2 gates
+
+- `GATE-PORTFOLIO-INTELLIGENCE`: IN PROGRESS. INT-001..016 implemented locally; browser QA with active PostgreSQL and CI remain.
+- `GATE-CONNECTIONS-CORE`: NOT STARTED.
+- `GATE-CONNECTIONS-LIVE`: PENDING_PROVIDER_SELECTION; no provider is approved.
+- `GATE-V1.2-INTELLIGENCE-BETA`: NOT STARTED.
+- `GATE-PROD-PUBLIC`: OUT OF SCOPE.
+
 ## Foundation
 Requires repository structure, build, migrations, tests, CI and no committed secrets.
 
