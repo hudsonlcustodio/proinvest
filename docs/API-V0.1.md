@@ -1,5 +1,12 @@
 # API V0.1
 
+## Intelligence V1.2
+
+- `GET /v1/dashboard` supports `accountId`, `strategyId`, `currency`, and `kind`; filtering and aggregation are server-side.
+- `GET /v1/dashboard/valuation-history` returns currency-separated append-only observations and `INSUFFICIENT_HISTORY` until two real points exist.
+
+Allocation contains only available market/economic value, explicitly named known value with coverage. Reads never create snapshots.
+
 ## Portfolio V1 query API — implemented
 
 The approved candidate decomposition is:

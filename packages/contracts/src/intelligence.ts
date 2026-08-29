@@ -1,0 +1,8 @@
+import type{AggregateMoneyMetric,CurrentPosition,PortfolioSummary,ProvenanceRef}from"./portfolio.js";
+export interface AllocationItem{key:string;label:string;currency:string;knownValue:string;shareOfKnownValue:string;positionCount:number;provenance:ProvenanceRef}
+export interface AllocationBreakdown{dimension:"STRATEGY"|"POSITION_KIND";currency:string;knownValue:string;coverage:{totalComponents:number;availableComponents:number;missingComponents:number};items:AllocationItem[]}
+export interface PortfolioHealth{valuationCoverage:{total:number;available:number;missing:number};missingValuationCount:number;unreconciledCount:number;degradedConnectionCount:number;leveragedExposureCount:number;multiCurrencyWithoutFx:boolean;netPnlIncomplete:boolean}
+export type InsightSeverity="INFO"|"ATTENTION"|"ACTION_REQUIRED";
+export interface Insight{id:string;type:string;severity:InsightSeverity;title:string;summary:string;evidence:Record<string,string|number|boolean>;suggestedReview:string;href:string;provenance:ProvenanceRef;generatedAt:string}
+export interface DashboardSummary{asOf:string;portfolio:PortfolioSummary;activeStrategies:number;allocations:AllocationBreakdown[];health:PortfolioHealth;insights:Insight[];positionsPreview:CurrentPosition[];lastMeaningfulDataUpdate:string|null;pendingReconciliationCount:number;connectionHealth:{active:number;degraded:number;lastSuccessfulSyncAt:string|null}}
+export interface ValuationSnapshot{id:string;scopeType:"PORTFOLIO";scopeId:string;currency:string;knownValue:string;status:AggregateMoneyMetric["status"];coverageTotal:number;coverageAvailable:number;coverageMissing:number;asOf:string;recordedAt:string;trigger:string;source:string}

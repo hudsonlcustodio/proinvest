@@ -1,5 +1,7 @@
 # PROJECT STATE — ProInvest
 
+Wave A V1.2 is complete on `v1.2-portfolio-intelligence`: executable PRD, architecture, typed Dashboard/Analytics/Insights query model, deterministic rules and append-only valuation history. PostgreSQL 18 regression, responsive browser QA and Actions run `33270737913` are green. No provider, FX, valuation or history is fabricated.
+
 Phase: V1.1 VISUAL SYSTEM COMPLETE
 Baseline: Portfolio Architecture (`536bd48fcf032c7a379ba0868496b28d375a228f`)
 Architecture: modular monolith
@@ -26,6 +28,7 @@ Golden cases: GOLDEN-001..007
 - PORTFOLIO-IMPLEMENT: PASS
 - V1.0-PRODUCT: PASS
 - UX-DESIGN-V1: PASS
+- PORTFOLIO-INTELLIGENCE: PASS
 - PROD: NOT STARTED
 
 ## Gaps
