@@ -1,11 +1,11 @@
 # PROJECT STATE — ProInvest
 
-Phase: IMPLEMENTATION / V1.0 Portfolio Core
+Phase: V1.1 VISUAL SYSTEM COMPLETE
 Baseline: Portfolio Architecture (`536bd48fcf032c7a379ba0868496b28d375a228f`)
 Architecture: modular monolith
 System of record: PostgreSQL
 External financial write: disabled
-Current scope: PRD V1.0 — Portfolio & Analytics (no production implementation)
+Current scope: PRD V1.0 — Portfolio & Analytics (product complete; public production gate excluded)
 Golden cases: GOLDEN-001..007
 
 ## Gates
@@ -24,6 +24,8 @@ Golden cases: GOLDEN-001..007
 - PORTFOLIO-SPEC: PASS
 - PORTFOLIO-ARCH: PASS
 - PORTFOLIO-IMPLEMENT: PASS
+- V1.0-PRODUCT: PASS
+- UX-DESIGN-V1: PASS
 - PROD: NOT STARTED
 
 ## Gaps
@@ -58,12 +60,20 @@ Multi-leg `EQUITY_PAIR@1` implemented for the Long & Short strategy with atomic 
 
 ## V1.0 Portfolio & Analytics specification
 
-`docs/PRD-PORTFOLIO-V1.md` defines Portfolio as a read-only on-read derived view, separates current positions from historical results, forbids implicit cross-currency totals, defines partial completeness and provenance, and establishes GOLDEN-001..007 acceptance requirements. No Portfolio production code, API, schema or UI has been implemented.
+`docs/PRD-PORTFOLIO-V1.md` defines Portfolio as a read-only on-read derived view, separates current positions from historical results, forbids implicit cross-currency totals, defines partial completeness and provenance, and establishes GOLDEN-001..007 acceptance requirements. Contracts, API and UI are implemented.
 
 ## V1.0 Portfolio & Analytics architecture
 
-`docs/ARCHITECTURE-PORTFOLIO-V1.md` freezes classify-before-aggregate, specialized holding/pair/LP aggregation, Strategy-aware PositionKey, separate historical results, aggregate coverage, currency buckets, valuation boundary, provenance and the proposed three-endpoint read API. ADR-011..014 are accepted. Portfolio implementation and delivery remain not started.
+`docs/ARCHITECTURE-PORTFOLIO-V1.md` freezes classify-before-aggregate, specialized holding/pair/LP aggregation, Strategy-aware PositionKey, separate historical results, aggregate coverage, currency buckets, valuation boundary, provenance and the three-endpoint read API. ADR-011..014 are accepted and implemented.
 
 ## V1.0 Portfolio Core implementation
 
 The read-only Portfolio core implements explicit classification, Strategy-aware holdings, operation-scoped pair/LP positions, closed historical results, partial aggregate coverage, per-currency buckets, provenance and the three approved HTTP endpoints. It remains on-read with no Portfolio table/cache and no dashboard. `DEC-P-001`, `DEC-P-002` and `DEC-P-006` remain pending and do not block the core.
+
+## V1.0 Product complete
+
+The Portfolio dashboard is the product entry point, with shared navigation to every operation flow, separate current/historical sections, partial-completeness language, currency buckets, responsive layout and keyboard/accessibility baseline. CI, security headers, web regression and `docs/RUNBOOK-V1.md` close the product gate. Public deployment remains explicitly outside this gate.
+
+## V1.1 Visual system
+
+ADR-015 selects a single React/Vite/Tailwind SPA. `DESIGN.md` freezes the dark-first private-banking/terminal contract. Portfolio and all six operation workflows are migrated to the canonical shell; legacy HTML is no longer served. Browser, frontend, licensing and security reviews are complete. Actions run `33255363156` passed with 31 server/domain/PostgreSQL tests, 5 frontend tests, 0 failed and 0 skipped. `GATE-UX-DESIGN-V1 = PASS`.

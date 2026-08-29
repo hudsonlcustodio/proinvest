@@ -104,3 +104,42 @@ Evidence: GitHub Actions run `33220406046`, 28 passed, 0 failed, 0 skipped, incl
 - PORT-IMP-020: PASS — complete GitHub Actions pipeline is green with zero skipped tests.
 
 [DECISÃO] `GATE-PORTFOLIO-IMPLEMENT = PASS`. This approves the read-only API/core; Portfolio dashboard remains not started.
+
+## V1.0 Product Complete
+
+- PROD-V1-001: PASS — GOLDEN-001..007 and Portfolio core remain in the full regression command.
+- PROD-V1-002: PASS — Portfolio UI consumes the three approved read endpoints.
+- PROD-V1-003: PASS — shared navigation integrates Portfolio and every operation flow.
+- PROD-V1-004: PASS — current positions and historical results are visually and semantically separate.
+- PROD-V1-005: PASS — incomplete metrics expose known subtotal, reason and coverage.
+- PROD-V1-006: PASS — currency buckets remain separate and global total explains missing base currency/FX.
+- PROD-V1-007: PASS — responsive layout, landmarks, skip link, focus states, reduced-motion handling, loading, empty and error states establish the UX/accessibility baseline.
+- PROD-V1-008: PASS — `npm test` is the complete unit/integration/web regression entry point.
+- PROD-V1-009: PASS — `docs/RUNBOOK-V1.md` covers setup, verification, failures and rollback.
+- PROD-V1-010: PASS — CI has read-only permissions, PostgreSQL 18, idempotent migration check, full tests, audit, concurrency control and timeout.
+- PROD-V1-011: PASS — security regression verifies CSP, anti-framing, no-sniff and browser capability restrictions; Portfolio remains read-only.
+
+[DECISÃO] `GATE-V1.0-PRODUCT-COMPLETE = PASS`. `GATE-PROD PUBLIC` is explicitly outside this gate and remains `NOT STARTED`.
+
+## UX Design V1.1
+
+- UX-001: PASS — canonical `DESIGN.md`.
+- UX-002: PASS — one React/Vite/Tailwind foundation.
+- UX-003: PASS — provenance, notices and license review recorded.
+- UX-004: PASS — premium typed Portfolio implemented.
+- UX-005: PASS — six vertical slices migrated into one shell.
+- UX-006: PASS — API remains the financial source of truth.
+- UX-007: PASS — known subtotal, reason and coverage remain explicit.
+- UX-008: PASS — BRL/USD isolation and unavailable global total are explicit.
+- UX-009: PASS — desktop/mobile browser QA completed.
+- UX-010: PASS — WCAG 2.2 AA baseline implemented.
+- UX-011: PASS — restrained motion and reduced-motion fallback.
+- UX-012: PASS — four-pass visual/browser smoke completed.
+- UX-013: PASS — no fake data or chart.
+- UX-014: PASS — CSP/security headers, escaped React rendering and zero secrets.
+- UX-015: PASS — GOLDEN-001..007 green locally.
+- UX-016: PASS — PostgreSQL Portfolio E2E green in Actions run `33255363156`.
+- UX-017: PASS — 5 frontend tests green.
+- UX-018: PASS — Actions run `33255363156`: 31 passed, 0 failed, 0 skipped; 5 frontend tests passed.
+
+[DECISÃO] `GATE-UX-DESIGN-V1 = PASS`. Public production remains outside this gate.
