@@ -1,14 +1,14 @@
-# UI Component Provenance
+# UI Component Provenance — Signature Polish
 
-Verified 2026-08-29 against official sites, repositories and npm metadata.
+Review date: 2026-08-29. No third-party component source was copied and no package was added. The implementations are local primitives using the existing Motion and Phosphor dependencies.
 
-| Source | Component/use | Version | License | Adapted | Local path | Why |
-|---|---|---:|---|---|---|---|
-| shadcn/ui | open-code primitive composition model | CLI 4.19.0 | MIT | yes, no copied registry file | `apps/web-app/src/components/ui.tsx` | owned Button/Input/Select/Field primitives with data-light composition |
-| Motion | route and drawer transitions | 13.1.1 | MIT | no | `AppShell.tsx` | restrained state transitions and reduced-motion API |
-| Phosphor Icons | single icon family | 2.1.10 | MIT | no | shell/pages | coherent accessible product iconography |
-| class-variance-authority | Button variant composition | 0.7.1 | Apache-2.0 | no | `components/ui.tsx` | small deterministic variants |
-| clsx | conditional classes | 2.1.1 | MIT | no | `components/ui.tsx` | class composition |
-| tailwind-merge | class conflict resolution | 3.6.0 | MIT | no | `components/ui.tsx` | safe local primitive extension |
+| Source evaluated | Pattern | Decision | License / revision | Local adaptation |
+| --- | --- | --- | --- | --- |
+| Kokonut UI | Command Button | Adopt concept | MIT, `83eec6d982d400a18438001a8efdbac1f159dd43` | Global navigation command with Ctrl/Cmd+K, listbox semantics and keyboard selection |
+| Kokonut UI | Smooth Tab | Adopt concept | MIT, same revision | Semantic Portfolio tabs with a restrained Motion layout indicator |
+| Kokonut UI | Smooth Drawer | Adopt concept | MIT, same revision | Dedicated mobile dialog with focus trap, Escape close and trigger-focus restoration |
+| Magic UI | Number Ticker | Reject | MIT, `2d671cc6c0e0f40e28682c9cbddd16694dcfe627` | Rolling numbers conflict with calm financial semantics; values remain stable |
+| React Bits | Reveal/hover patterns | Reject | repository license includes MIT plus Commons Clause restrictions | Unnecessary license surface and decorative motion |
+| Bklit | Charts | Reject | not installed | No real time series exists; the product contract forbids synthetic charts |
 
-Kokonut UI (MIT) was reviewed as visual reference; no registry component was copied or installed. React Bits and Magic UI were not adopted because their accent effects do not improve current financial workflows. Bklit chart components are MIT, while Bklit Studio is proprietary; neither entered the code because no real time series justifies a chart. Impeccable, Taste and OpenDesign are governance references only, not runtime dependencies.
+Upstream projects were used only for pattern evaluation. Local code retains ProInvest tokens, semantics, icon system, motion level 3/10 and reduced-motion behavior.

@@ -12,4 +12,4 @@ ProInvest uses packages distributed under their respective licenses. Exact resol
 - Vitest, Testing Library and jsdom — respective contributors — MIT.
 - Rolldown Windows binding — Rolldown contributors — MIT.
 
-No Kokonut UI, React Bits, Magic UI or Bklit source code is incorporated. shadcn/ui informed the local open-code component architecture; no registry component was copied verbatim.
+No Kokonut UI, React Bits, Magic UI or Bklit source code is incorporated. Kokonut UI patterns informed local command, tab and drawer primitives; no registry component was copied verbatim. Magic UI, React Bits and Bklit were evaluated and rejected. See `docs/UI-COMPONENT-PROVENANCE.md`.

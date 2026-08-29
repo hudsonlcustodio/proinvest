@@ -22,7 +22,7 @@ UI uses Segoe UI Variable with system fallbacks, requiring no bundled binary. Fi
 
 ## Components
 
-Navigation is a fixed desktop sidebar and mobile drawer. Content has one header and bounded width. Forms use label, optional support text, explicit error, unit in the label and 42px minimum control height. Tables serve holdings and history; pair and LP exposures retain specialized structure. Cards/panels are used only for coherent currency or exposure units.
+Navigation is a fixed desktop sidebar, an accessible mobile drawer and a global command opened by Ctrl/Cmd+K. The drawer traps focus, closes with Escape and restores focus. Content has one header and bounded width. Portfolio uses semantic Current/Historical tabs; tables serve holdings and history while pair and LP exposures retain specialized structure. Cards/panels are used only for coherent currency or exposure units.
 
 ## Financial metrics
 
@@ -34,7 +34,7 @@ Loading uses structural skeletons. Empty states name the missing record without 
 
 ## Motion
 
-Only route entry/exit and mobile navigation transition may move. Durations are 120–180ms. `prefers-reduced-motion` collapses every animation. P&L and numbers never roll, bounce or simulate trading activity.
+Only route entry/exit, command/drawer transitions, the tab indicator and one-pixel currency focus may move. Durations are 120–180ms. `prefers-reduced-motion` collapses every animation. P&L and numbers never roll, bounce or simulate trading activity.
 
 ## Responsive and accessibility
 
