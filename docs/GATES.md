@@ -138,8 +138,8 @@ Evidence: GitHub Actions run `33220406046`, 28 passed, 0 failed, 0 skipped, incl
 - UX-013: PASS — no fake data or chart.
 - UX-014: PASS — CSP/security headers, escaped React rendering and zero secrets.
 - UX-015: PASS — GOLDEN-001..007 green locally.
-- UX-016: PENDING CI — PostgreSQL Portfolio E2E requires CI service.
+- UX-016: PASS — PostgreSQL Portfolio E2E green in Actions run `33255363156`.
 - UX-017: PASS — 5 frontend tests green.
-- UX-018: PENDING CI — zero-skipped complete pipeline.
+- UX-018: PASS — Actions run `33255363156`: 31 passed, 0 failed, 0 skipped; 5 frontend tests passed.
 
-`GATE-UX-DESIGN-V1` remains `IN VALIDATION` until UX-016 and UX-018 are evidenced by CI.
+[DECISÃO] `GATE-UX-DESIGN-V1 = PASS`. Public production remains outside this gate.

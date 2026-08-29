@@ -1,6 +1,6 @@
 # PROJECT STATE — ProInvest
 
-Phase: V1.1 VISUAL SYSTEM / CI VALIDATION
+Phase: V1.1 VISUAL SYSTEM COMPLETE
 Baseline: Portfolio Architecture (`536bd48fcf032c7a379ba0868496b28d375a228f`)
 Architecture: modular monolith
 System of record: PostgreSQL
@@ -25,7 +25,7 @@ Golden cases: GOLDEN-001..007
 - PORTFOLIO-ARCH: PASS
 - PORTFOLIO-IMPLEMENT: PASS
 - V1.0-PRODUCT: PASS
-- UX-DESIGN-V1: IN VALIDATION
+- UX-DESIGN-V1: PASS
 - PROD: NOT STARTED
 
 ## Gaps
@@ -76,4 +76,4 @@ The Portfolio dashboard is the product entry point, with shared navigation to ev
 
 ## V1.1 Visual system
 
-ADR-015 selects a single React/Vite/Tailwind SPA. `DESIGN.md` freezes the dark-first private-banking/terminal contract. Portfolio and all six operation workflows are migrated to the canonical shell; legacy HTML is no longer served. Browser, frontend, licensing and security reviews are complete locally. `GATE-UX-DESIGN-V1` awaits the zero-skipped PostgreSQL CI run.
+ADR-015 selects a single React/Vite/Tailwind SPA. `DESIGN.md` freezes the dark-first private-banking/terminal contract. Portfolio and all six operation workflows are migrated to the canonical shell; legacy HTML is no longer served. Browser, frontend, licensing and security reviews are complete. Actions run `33255363156` passed with 31 server/domain/PostgreSQL tests, 5 frontend tests, 0 failed and 0 skipped. `GATE-UX-DESIGN-V1 = PASS`.
