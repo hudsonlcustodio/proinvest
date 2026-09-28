@@ -10,7 +10,9 @@ export interface CreateEquityHoldingRecord {
   quantity: string;
   entryPrice: string;
   currency: string;
-  sourceType: "MANUAL";
+  sourceType: "MANUAL"|"FILE_IMPORT";
+  sourceId?: string;
+  externalId?: string;
 }
 
 export interface CreateEquityPairRecord { strategyId:string; accountId:string; openedAt:string; legs:Array<{instrumentId:string;side:"BUY"|"SELL";quantity:string;entryPrice:string;currency:string}>; sourceType:"MANUAL" }
@@ -46,14 +48,16 @@ export async function insertEquityHolding(
   await db.query(`
     INSERT INTO operations (
       id, strategy_id, account_id, template_type, template_version,
-      operation_type, status, opened_at, source_type
-    ) VALUES ($1, $2, $3, 'EQUITY_HOLDING', 1, 'HOLDING', 'OPEN', $4, $5)
+      operation_type, status, opened_at, source_type, source_id, external_id
+    ) VALUES ($1, $2, $3, 'EQUITY_HOLDING', 1, 'HOLDING', 'OPEN', $4, $5, $6, $7)
   `, [
     operationId,
     input.strategyId,
     input.accountId,
     input.openedAt,
-    input.sourceType
+    input.sourceType,
+    input.sourceId ?? null,
+    input.externalId ?? null
   ]);
 
   await db.query(`

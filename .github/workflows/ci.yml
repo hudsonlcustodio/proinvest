@@ -15,7 +15,7 @@ permissions:
 jobs:
   build-test:
     runs-on: ubuntu-latest
-    timeout-minutes: 15
+    timeout-minutes: 25
 
     services:
       postgres:
@@ -49,4 +49,14 @@ jobs:
       - run: npm run db:seed
       - run: npm test
       - run: npm run test:web
+      - run: npx playwright install --with-deps chromium
+      - run: npm run test:browser
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: browser-qa
+          path: |
+            test-results
+            playwright-report
+          retention-days: 14
       - run: npm audit --audit-level=high

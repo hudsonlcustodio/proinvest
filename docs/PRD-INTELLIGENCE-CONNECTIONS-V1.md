@@ -27,7 +27,7 @@ Order execution, transfers, signing, leverage mutation, tax, forecasts, public d
 - RF-REC-001..006: never guess Strategy; explicit resolution/rejection; safe bulk only.
 
 ## Data, security and privacy
-PostgreSQL is system of record. Secrets never return to the client or enter URLs/logs/plaintext columns. External payloads are allowlisted and minimized. Default retention for sanitized staging is configurable; exact policy is DEC-PENDING-RETENTION-001. Private beta only; no public exposure without auth/KMS/TLS/backup/incident readiness.
+PostgreSQL is system of record. Secrets never return to the client or enter URLs/logs/plaintext columns. External payloads are allowlisted and minimized. DEC-RETENTION-001: terminal sanitized staging records (IMPORTED/REJECTED) are retained for 90 days by default and pruned by an explicit maintenance command; PENDING/READY records are never auto-pruned. Operators may set STAGING_RETENTION_DAYS to 1..3650 based on governance. Canonical source provenance and sync counters remain after pruning. Private beta only; no public exposure without auth/KMS/TLS/backup/incident readiness.
 
 ## Non-functional requirements
 - RNF-001 WCAG 2.2 AA baseline and textual chart fallback.

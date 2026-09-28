@@ -16,9 +16,11 @@
     "dev:web": "vite",
     "db:migrate": "node scripts/migrate.mjs",
     "db:seed": "node scripts/seed.mjs",
+    "db:prune-staging": "node scripts/prune-staging.mjs",
     "test:unit": "npm run build && node --test \"dist/tests/golden/**/*.test.js\"",
     "test:integration": "npm run build && node --test \"dist/tests/integration/**/*.test.js\"",
-    "test:web": "vitest run"
+    "test:web": "vitest run",
+    "test:browser": "playwright test"
   },
   "dependencies": {
     "@phosphor-icons/react": "2.1.10",
@@ -33,6 +35,7 @@
     "tailwind-merge": "3.6.0"
   },
   "devDependencies": {
+    "@playwright/test": "^1.63.0",
     "@tailwindcss/vite": "4.3.3",
     "@testing-library/dom": "10.4.1",
     "@testing-library/react": "16.3.3",

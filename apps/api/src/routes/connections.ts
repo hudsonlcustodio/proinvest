@@ -1,0 +1,15 @@
+import{Router}from"express";import{providers,connections,addConnection,testConnection,storeCredential,destroyCredential,importCsv,syncRuns,staging,reconcile,promote,reject}from"../services/connections-service.js";
+export const connectionsRouter=Router();
+const handler=(work:(req:any)=>Promise<unknown>)=>async(req:any,res:any)=>{try{res.json(await work(req))}catch(error){const code=error instanceof Error?error.message:"CONNECTION_ERROR",status=code==="EXTERNAL_ID_CONFLICT"?409:/NOT_FOUND/.test(code)?404:/REQUIRED|INVALID|UNSUPPORTED|NOT_READY|NOT_ACTIONABLE|TOO_LARGE/.test(code)?422:500;res.status(status).json({type:status===500?"internal_error":"validation_error",status,code:status===500?"CONNECTION_ERROR":code})}};
+connectionsRouter.get("/providers",(_req,res)=>res.json({items:providers()}));
+connectionsRouter.get("/",handler(async()=>({items:await connections()})));
+connectionsRouter.post("/",handler(async req=>({...await addConnection(req.body),status:"ACTIVE"})));
+connectionsRouter.post("/:id/test",handler(async req=>testConnection(req.params.id)));
+connectionsRouter.post("/:id/credential",handler(async req=>storeCredential(req.params.id,req.body?.secret)));
+connectionsRouter.delete("/:id/credential",handler(async req=>destroyCredential(req.params.id)));
+connectionsRouter.post("/:id/imports",handler(async req=>importCsv(req.params.id,{filename:req.body?.filename,content:req.body?.content})));
+connectionsRouter.get("/sync-runs",handler(async()=>({items:await syncRuns()})));
+connectionsRouter.get("/reconciliation",handler(async()=>({items:await staging()})));
+connectionsRouter.patch("/reconciliation/:id",handler(async req=>reconcile(req.params.id,req.body)));
+connectionsRouter.post("/reconciliation/:id/promote",handler(async req=>promote(req.params.id)));
+connectionsRouter.post("/reconciliation/:id/reject",handler(async req=>reject(req.params.id)));
