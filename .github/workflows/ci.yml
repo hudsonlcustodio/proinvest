@@ -54,7 +54,20 @@ jobs:
           grep -q 'ℹ skipped 0' test-output.log
       - run: npm run test:web
       - run: npx playwright install --with-deps chromium
-      - run: npm run test:browser
+      - name: Create isolated browser QA database
+        run: node scripts/create-browser-test-db.mjs
+      - name: Migrate isolated browser QA database
+        run: npm run db:migrate
+        env:
+          DATABASE_URL: postgresql://proinvest:proinvest@localhost:5432/proinvest_browser
+      - name: Seed isolated browser QA database
+        run: npm run db:seed
+        env:
+          DATABASE_URL: postgresql://proinvest:proinvest@localhost:5432/proinvest_browser
+      - name: Real Chromium QA (desktop and mobile)
+        run: npm run test:browser
+        env:
+          DATABASE_URL: postgresql://proinvest:proinvest@localhost:5432/proinvest_browser
       - uses: actions/upload-artifact@v4
         if: always()
         with:

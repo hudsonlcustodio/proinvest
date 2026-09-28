@@ -55,8 +55,8 @@ maybeTest("TEST-IMP negative validation, external identity and concurrent transi
 });
 maybeTest("terminal staging retention preserves actionable records",async()=>{
   const client=new pg.Client({connectionString:url});await client.connect();
+  const connectionId=crypto.randomUUID(),runId=crypto.randomUUID();
   try{
-    const connectionId=crypto.randomUUID(),runId=crypto.randomUUID();
     await client.query(`INSERT INTO connections(id,provider_key,display_name) VALUES($1,'FILE_IMPORT','Retention QA')`,[connectionId]);
     await client.query(`INSERT INTO sync_runs(id,connection_id,status) VALUES($1,$2,'COMPLETED')`,[runId,connectionId]);
     const ids=[crypto.randomUUID(),crypto.randomUUID(),crypto.randomUUID()];
@@ -65,5 +65,10 @@ maybeTest("terminal staging retention preserves actionable records",async()=>{
     execFileSync(process.execPath,["scripts/prune-staging.mjs"],{env:{...process.env,DATABASE_URL:url!,STAGING_RETENTION_DAYS:"1"}});
     const remaining=await client.query(`SELECT status FROM staging_records WHERE connection_id=$1 ORDER BY status`,[connectionId]);
     assert.deepEqual(remaining.rows.map(x=>x.status),["PENDING","READY"]);
-  }finally{await client.end()}
+  }finally{
+    await client.query(`DELETE FROM staging_records WHERE connection_id=$1`,[connectionId]);
+    await client.query(`DELETE FROM sync_runs WHERE connection_id=$1`,[connectionId]);
+    await client.query(`DELETE FROM connections WHERE id=$1`,[connectionId]);
+    await client.end();
+  }
 });

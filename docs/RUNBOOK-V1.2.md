@@ -20,9 +20,9 @@ npm run test:browser
 npm audit --audit-level=high
 ```
 
-The second migration run checks idempotency. `npm test` must report zero skips; if `TEST_DATABASE_URL` is absent, PostgreSQL tests skip and the beta gate cannot pass. Playwright starts the built API itself and runs Chromium at desktop (1440×900) and mobile (390×844) viewports. Screenshots, trace-on-failure and the HTML report are CI artifacts. The browser suite writes synthetic test records and must use the disposable database.
+The second migration run checks idempotency. `npm test` must report zero skips; if `TEST_DATABASE_URL` is absent, PostgreSQL tests skip and the beta gate cannot pass. CI creates a second, isolated PostgreSQL 18 database for browser QA, migrates/seeds it, then Playwright starts the built API and runs Chromium at desktop (1440×900) and mobile (390×844) viewports. Screenshots, trace-on-failure and the HTML report are CI artifacts. The browser suite writes synthetic test records and must use a disposable database.
 
-For a private local review, build with `npm run build`, start the API with `npm run start:api`, and open `http://127.0.0.1:3000/dashboard`. Check `/health`, `/portfolio`, `/connections`, `/sync` and `/reconciliation`. Do not assume a Vite server on port 5173 belongs to ProInvest without checking its document title and proxy target.
+For a private local review, build with `npm run build`, start the API with `npm run start:api`, and open `http://127.0.0.1:3000/dashboard`. The server binds loopback by default. Binding another address requires an explicit `HOST` and `ALLOW_PRIVATE_NETWORK_BIND=true`; do not use this unauthenticated beta on a public interface. Check `/health`, `/portfolio`, `/connections`, `/sync` and `/reconciliation`. Do not assume a Vite server on port 5173 belongs to ProInvest without checking its document title and proxy target.
 
 ## Import and data safety
 
