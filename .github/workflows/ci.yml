@@ -47,7 +47,11 @@ jobs:
       - run: npm run db:migrate
       - run: npm run db:migrate
       - run: npm run db:seed
-      - run: npm test
+      - name: Full PostgreSQL regression (zero skips)
+        run: |
+          set -o pipefail
+          npm test | tee test-output.log
+          grep -q 'ℹ skipped 0' test-output.log
       - run: npm run test:web
       - run: npx playwright install --with-deps chromium
       - run: npm run test:browser

@@ -31,16 +31,16 @@ test("real browser: CSV to staging to canonical Portfolio and Dashboard", async 
   const readyRow = page.locator("article.reconciliation-card").filter({ has: page.getByText(externalId, { exact: true }) });
   await expect(readyRow).toBeVisible();
   await readyRow.getByRole("button", { name: "Confirmar e importar" }).click();
-  await expect(readyRow.getByText("IMPORTED")).toBeVisible();
+  await expect(readyRow.locator(".status")).toHaveText("Importado");
   const pendingRow = page.locator("article.reconciliation-card").filter({ has: page.getByText(pendingExternalId, { exact: true }) });
-  await expect(pendingRow.getByText("PENDING")).toBeVisible();
+  await expect(pendingRow.locator(".status")).toHaveText("Pendente");
   await pendingRow.getByLabel("Strategy").selectOption({ label: "Microcaps" });
   await pendingRow.getByLabel("Instrumento").selectOption({ label: "EMBR3 · BRL" });
   await pendingRow.getByLabel("Conta").selectOption({ label: "Conta Manual Beta" });
   await pendingRow.getByRole("button", { name: "Resolver" }).click();
-  await expect(pendingRow.getByText("READY")).toBeVisible();
+  await expect(pendingRow.locator(".status")).toHaveText("Pronto");
   await pendingRow.getByRole("button", { name: "Confirmar e importar" }).click();
-  await expect(pendingRow.getByText("IMPORTED")).toBeVisible();
+  await expect(pendingRow.locator(".status")).toHaveText("Importado");
   await page.screenshot({ path: testInfo.outputPath("reconciliation.png"), fullPage: true });
 
   const operation = await request.get(`/v1/connections/reconciliation`);
@@ -63,4 +63,18 @@ test("real browser: CSV to staging to canonical Portfolio and Dashboard", async 
   await expect(page.getByRole("table")).toBeVisible();
   const overflow = await page.evaluate(() => document.documentElement.scrollWidth - window.innerWidth);
   expect(overflow).toBeLessThanOrEqual(1);
+});
+
+test("Dashboard reference-data p95 remains below 500 ms", async ({ request }, testInfo) => {
+  for (let i = 0; i < 5; i++) expect((await request.get("/v1/dashboard")).ok()).toBeTruthy();
+  const timings: number[] = [];
+  for (let i = 0; i < 25; i++) {
+    const started = performance.now();
+    expect((await request.get("/v1/dashboard")).ok()).toBeTruthy();
+    timings.push(performance.now() - started);
+  }
+  timings.sort((a, b) => a - b);
+  const p95 = timings[Math.ceil(timings.length * 0.95) - 1]!;
+  console.info("dashboard_p95_ms", { project: testInfo.project.name, p95: Math.round(p95), samples: timings.length });
+  expect(p95).toBeLessThan(500);
 });

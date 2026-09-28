@@ -13,7 +13,39 @@ type NoticeValue = { kind: "success" | "error"; text: string };
 function Header({ kicker, title, copy }: { kicker: string; title: string; copy: string }) {
   return <header className="content-header"><div><p className="kicker">{kicker}</p><h1>{title}</h1><p>{copy}</p></div></header>;
 }
-function Status({ value }: { value: string }) { return <span className={`status ${value.toLowerCase()}`}>{value}</span>; }
+const statusLabels: Record<string, string> = {
+  AVAILABLE: "Disponível", INCOMPLETE: "Indisponível", ACTIVE: "Ativa", REVOKED: "Revogada",
+  RUNNING: "Em andamento", COMPLETED: "Concluída", FAILED: "Falhou", PENDING: "Pendente",
+  READY: "Pronto", IMPORTED: "Importado", REJECTED: "Rejeitado"
+};
+function Status({ value }: { value: string }) { return <span className={`status ${value.toLowerCase()}`} title={value}>{statusLabels[value] ?? value}</span>; }
+function issueLabel(code: string) {
+  const labels: Record<string, string> = {
+    STRATEGY_RECONCILIATION_REQUIRED: "Selecione uma Strategy Equity Holding.",
+    INSTRUMENT_RECONCILIATION_REQUIRED: "Selecione um instrumento que corresponda ao símbolo e à moeda.",
+    ACCOUNT_RECONCILIATION_REQUIRED: "Selecione uma conta ativa.",
+    UNSUPPORTED_SIDE: "Somente operações BUY são suportadas nesta importação."
+  };
+  if (labels[code]) return labels[code];
+  if (code.startsWith("MISSING_")) return `Campo obrigatório ausente: ${code.slice(8).toLowerCase()}.`;
+  if (code.startsWith("INVALID_")) return `Campo inválido: ${code.slice(8).toLowerCase()}.`;
+  return code;
+}
+function errorText(error: unknown) {
+  const code = error instanceof Error ? error.message : "CONNECTION_ERROR";
+  const labels: Record<string, string> = {
+    CONNECTION_ERROR: "O serviço de conexões não respondeu. Confirme que a API e o banco estão ativos.",
+    EXTERNAL_ID_CONFLICT: "O mesmo identificador externo foi enviado com dados diferentes. Revise a origem antes de importar novamente.",
+    INVALID_RECONCILIATION_REFERENCE: "Selecione uma Strategy, instrumento e conta compatíveis com o registro.",
+    STAGING_NOT_READY: "O registro ainda não está pronto para importação.",
+    STAGING_NOT_ACTIONABLE: "O registro já foi tratado ou não pode mais ser alterado.",
+    INVALID_IMPORT_REQUEST: "Arquivo de importação inválido.",
+    INVALID_CSV: "O CSV está malformado.",
+    INVALID_CSV_ROW: "Uma linha do CSV não corresponde ao cabeçalho.",
+    FILE_TOO_LARGE: "O arquivo excede o limite de importação."
+  };
+  return labels[code] ?? code;
+}
 function Notice({ value }: { value: NoticeValue }) {
   return <div className="notice" role={value.kind === "error" ? "alert" : "status"}>
     {value.kind === "error" ? <WarningCircle size={19} /> : <CheckCircle size={19} />}<span>{value.text}</span>
@@ -35,7 +67,7 @@ export function ConnectionsPage() {
         api<{ items: ConnectionView[] }>("/v1/connections")
       ]);
       setProviders(p.items); setItems(c.items); setNotice(null); return true;
-    } catch (error) { setItems(null); setNotice({ kind: "error", text: (error as Error).message }); return false; }
+    } catch (error) { setItems(null); setNotice({ kind: "error", text: errorText(error) }); return false; }
   };
   useEffect(() => { void load(); }, []);
   const create = async () => {
@@ -43,7 +75,7 @@ export function ConnectionsPage() {
     try {
       await api("/v1/connections", json("POST", { providerKey: "FILE_IMPORT", displayName: "Importação CSV" }));
       if (await load()) setNotice({ kind: "success", text: "Conexão de importação criada." });
-    } catch (error) { setNotice({ kind: "error", text: (error as Error).message }); }
+    } catch (error) { setNotice({ kind: "error", text: errorText(error) }); }
     finally { setBusy(false); }
   };
   const upload = async (connectionId: string, event: ChangeEvent<HTMLInputElement>) => {
@@ -53,7 +85,7 @@ export function ConnectionsPage() {
       const result = await api<{ fetched: number; ready: number; pending: number; duplicate: number; rejected: number }>(
         `/v1/connections/${connectionId}/imports`, json("POST", { filename: file.name, content: await file.text() }));
       if (await load()) setNotice({ kind: "success", text: `${result.fetched} registro(s): ${result.ready} prontos, ${result.pending} pendentes, ${result.duplicate} duplicados e ${result.rejected} rejeitados.` });
-    } catch (error) { setNotice({ kind: "error", text: (error as Error).message }); }
+    } catch (error) { setNotice({ kind: "error", text: errorText(error) }); }
     finally { setBusy(false); event.target.value = ""; }
   };
   return <>
@@ -79,15 +111,15 @@ export function SyncPage() {
   const load = async () => {
     setError("");
     try { setItems((await api<{ items: SyncRunView[] }>("/v1/connections/sync-runs")).items); }
-    catch (cause) { setItems(null); setError((cause as Error).message); }
+    catch (cause) { setItems(null); setError(errorText(cause)); }
   };
   useEffect(() => { void load(); }, []);
   return <><Header kicker="Observabilidade" title="Sync Center" copy="Execuções sanitizadas, sem credenciais ou payload bruto." />
     {error ? <ErrorState message={error} retry={() => void load()} /> :
       items === null ? <div className="state" role="status">Carregando sincronizações…</div> :
       items.length ? <div className="data-table-wrap"><table className="data-table"><thead><tr>
-        <th>Status</th><th>Início</th><th className="align-right">Duração</th><th className="align-right">Lidos</th><th className="align-right">Prontos</th><th className="align-right">Importados</th><th className="align-right">Duplicados</th><th className="align-right">Pendentes</th><th className="align-right">Rejeitados</th>
-      </tr></thead><tbody>{items.map(x => <tr key={x.id}><td><Status value={x.status} /></td><td>{new Date(x.startedAt).toLocaleString("pt-BR")}</td><td className="align-right num">{x.durationMs === null ? "—" : `${x.durationMs} ms`}</td><td className="align-right num">{x.fetched}</td><td className="align-right num">{x.ready}</td><td className="align-right num">{x.imported}</td><td className="align-right num">{x.duplicate}</td><td className="align-right num">{x.pending}</td><td className="align-right num">{x.rejected}</td></tr>)}</tbody></table></div> :
+        <th>Status</th><th>Início</th><th>Erro</th><th className="align-right">Duração</th><th className="align-right">Lidos</th><th className="align-right">Prontos</th><th className="align-right">Importados</th><th className="align-right">Duplicados</th><th className="align-right">Pendentes</th><th className="align-right">Rejeitados</th>
+      </tr></thead><tbody>{items.map(x => <tr key={x.id}><td><Status value={x.status} /></td><td>{new Date(x.startedAt).toLocaleString("pt-BR")}</td><td>{x.errorCode ?? "—"}</td><td className="align-right num">{x.durationMs === null ? "—" : `${x.durationMs} ms`}</td><td className="align-right num">{x.fetched}</td><td className="align-right num">{x.ready}</td><td className="align-right num">{x.imported}</td><td className="align-right num">{x.duplicate}</td><td className="align-right num">{x.pending}</td><td className="align-right num">{x.rejected}</td></tr>)}</tbody></table></div> :
       <div className="state"><CheckCircle size={24} /><h3>Nenhuma sincronização</h3><p>As execuções aparecem aqui após uma importação CSV.</p></div>}
   </>;
 }
@@ -103,7 +135,7 @@ export function ReconciliationPage() {
     try {
       const [staged, references] = await Promise.all([api<{ items: StagingRecordView[] }>("/v1/connections/reconciliation"), getReferences()]);
       setItems(staged.items); setRefs(references); return true;
-    } catch (error) { setItems(null); setLoadingError((error as Error).message); return false; }
+    } catch (error) { setItems(null); setLoadingError(errorText(error)); return false; }
   };
   useEffect(() => { void load(); }, []);
   const resolve = async (item: StagingRecordView, form: HTMLFormElement) => {
@@ -111,13 +143,13 @@ export function ReconciliationPage() {
     const body = { strategyId: String(data.get("strategyId")), instrumentId: String(data.get("instrumentId")), accountId: String(data.get("accountId")) };
     setBusyId(item.id); setNotice(null);
     try { await api(`/v1/connections/reconciliation/${item.id}`, json("PATCH", body)); if (await load()) setNotice({ kind: "success", text: "Referências reconciliadas. O registro está pronto para confirmação." }); }
-    catch (error) { setNotice({ kind: "error", text: (error as Error).message }); }
+    catch (error) { setNotice({ kind: "error", text: errorText(error) }); }
     finally { setBusyId(null); }
   };
   const action = async (item: StagingRecordView, name: "promote" | "reject") => {
     setBusyId(item.id); setNotice(null);
     try { await api(`/v1/connections/reconciliation/${item.id}/${name}`, json("POST")); if (await load()) setNotice({ kind: "success", text: name === "promote" ? "Operação importada com provenance." : "Registro rejeitado." }); }
-    catch (error) { setNotice({ kind: "error", text: (error as Error).message }); }
+    catch (error) { setNotice({ kind: "error", text: errorText(error) }); }
     finally { setBusyId(null); }
   };
   return <><Header kicker="Controle humano" title="Reconciliação" copy="Strategy, instrumento e conta precisam estar resolvidos antes da promoção canônica." />
@@ -128,7 +160,7 @@ export function ReconciliationPage() {
         {items.map(item => <article className="panel reconciliation-card" key={item.id}>
           <div className="reconciliation-head"><div><strong>{item.normalized.symbol || "Símbolo ausente"}</strong><span>{item.normalized.externalId || "sem external ID"}</span></div><Status value={item.status} /></div>
           <p>{item.normalized.quantity || "?"} × {item.normalized.entryPrice || "?"} {item.normalized.currency || ""} · {item.normalized.openedAt || "data ausente"}</p>
-          {item.issues.length > 0 && <ul>{item.issues.map(x => <li key={x}>{x}</li>)}</ul>}
+          {item.issues.length > 0 && <ul>{item.issues.map(x => <li key={x}>{issueLabel(x)}</li>)}</ul>}
           {item.status === "PENDING" && <form onSubmit={event => { event.preventDefault(); void resolve(item, event.currentTarget); }} className="reconciliation-form">
             <select className="select" name="strategyId" aria-label="Strategy" required defaultValue={item.strategyId ?? ""}><option value="">Strategy</option>{refs.strategies.filter(x => x.templateType === "EQUITY_HOLDING").map(x => <option key={x.id} value={x.id}>{x.name}</option>)}</select>
             <select className="select" name="instrumentId" aria-label="Instrumento" required defaultValue={item.instrumentId ?? ""}><option value="">Instrumento</option>{refs.instruments.filter(x => x.assetClass === "EQUITY" && x.symbol === item.normalized.symbol && x.currency?.toUpperCase() === item.normalized.currency).map(x => <option key={x.id} value={x.id}>{x.symbol} · {x.currency}</option>)}</select>
