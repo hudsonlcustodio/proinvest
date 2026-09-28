@@ -11,7 +11,7 @@ test("real browser: CSV to staging to canonical Portfolio and Dashboard", async 
   const connection = await created.json() as { id: string };
 
   await page.goto("/connections");
-  await expect(page.getByRole("heading", { name: "Conexões" })).toBeVisible();
+  await expect(page.getByRole("heading", { name: "Conexões", exact: true })).toBeVisible();
   const card = page.locator("article.connection-card").filter({ hasText: displayName });
   await expect(card).toBeVisible();
   await page.screenshot({ path: testInfo.outputPath("connections.png"), fullPage: true });
@@ -28,12 +28,11 @@ test("real browser: CSV to staging to canonical Portfolio and Dashboard", async 
 
   await page.goto("/reconciliation");
   await expect(page.getByRole("heading", { name: "Reconciliação" })).toBeVisible();
-  const row = page.locator("article.reconciliation-card").filter({ hasText: externalId });
-  const readyRow = row.filter({ hasText: externalId }).filter({ hasNotText: pendingExternalId });
+  const readyRow = page.locator("article.reconciliation-card").filter({ has: page.getByText(externalId, { exact: true }) });
   await expect(readyRow).toBeVisible();
   await readyRow.getByRole("button", { name: "Confirmar e importar" }).click();
   await expect(readyRow.getByText("IMPORTED")).toBeVisible();
-  const pendingRow = page.locator("article.reconciliation-card").filter({ hasText: pendingExternalId });
+  const pendingRow = page.locator("article.reconciliation-card").filter({ has: page.getByText(pendingExternalId, { exact: true }) });
   await expect(pendingRow.getByText("PENDING")).toBeVisible();
   await pendingRow.getByLabel("Strategy").selectOption({ label: "Microcaps" });
   await pendingRow.getByLabel("Instrumento").selectOption({ label: "EMBR3 · BRL" });

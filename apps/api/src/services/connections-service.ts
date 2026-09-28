@@ -98,6 +98,7 @@ export async function importCsv(id: string, input: { filename: string; content: 
   const connector = connectorRegistry.get(connection.provider_key);
   if (!connector) throw new Error("PROVIDER_NOT_AVAILABLE");
   const runId = await withTransaction(db => createSyncRun(db, id));
+  const startedAt = Date.now();
   try {
     const rows = await connector.fetchRecords(input);
     const counters = await withTransaction(async db => {
@@ -122,12 +123,12 @@ export async function importCsv(id: string, input: { filename: string; content: 
       await db.query(`UPDATE connections SET last_sync_at=NOW(),updated_at=NOW() WHERE id=$1`, [id]);
       return counts;
     });
-    console.info("connection_sync", { runId, status: "COMPLETED", fetched: rows.length, ...counters });
+    console.info("connection_sync", { runId, status: "COMPLETED", fetched: rows.length, durationMs: Date.now() - startedAt, ...counters });
     return { syncRunId: runId, fetched: rows.length, ...counters };
   } catch (error) {
     const code = error instanceof Error && error.message === "EXTERNAL_ID_CONFLICT" ? "EXTERNAL_ID_CONFLICT" : "IMPORT_FAILED";
     await withTransaction(db => failSyncRun(db, runId, code));
-    console.warn("connection_sync", { runId, status: "FAILED", errorCode: code });
+    console.warn("connection_sync", { runId, status: "FAILED", errorCode: code, durationMs: Date.now() - startedAt });
     throw error;
   }
 }

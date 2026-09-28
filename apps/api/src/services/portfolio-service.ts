@@ -52,7 +52,7 @@ export async function getPortfolioSummary(filters:{strategyId?:string;accountId?
   for(const metric of[knownCostBasis,knownMarketValue,historicalGrossPnl,historicalNetPnl])if(metric.status!=="AVAILABLE")incompleteMetricsCount++;
   return{currency,knownCostBasis,knownMarketValue,historicalGrossPnl,historicalNetPnl};
  });
- const globalTotal:PortfolioSummary["globalTotal"]=currencyBuckets.length===1?{status:"INCOMPLETE",value:null,reason:"BASE_CURRENCY_NOT_CONFIGURED"}:{status:"INCOMPLETE",value:null,reason:"MISSING_FX_RATE"};
+ const globalTotal:PortfolioSummary["globalTotal"]=currencyBuckets.length<=1?{status:"INCOMPLETE",value:null,reason:"BASE_CURRENCY_NOT_CONFIGURED"}:{status:"INCOMPLETE",value:null,reason:"MISSING_FX_RATE"};
  console.info("portfolio_query",{queryType:"summary",positionsCount:allPositions.length,currencyBucketsCount:currencyBuckets.length,incompleteMetricsCount,durationMs:Math.round(data.duration)});
  return{asOf:new Date().toISOString(),currentPositionsCount:allPositions.length,incompleteMetricsCount,currencyBuckets,globalTotal};
 }
