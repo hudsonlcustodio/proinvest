@@ -1,8 +1,6 @@
 # ProInvest
 
-Portfolio e registro manual de operações com domínio financeiro exato, API Express/PostgreSQL e SPA React dark-first.
-
-Primeiro vertical slice: `Strategy → EQUITY_HOLDING → Operation → Position → Golden Tests`.
+Portfolio, inteligência determinística e importação CSV somente leitura para beta privada, com domínio financeiro exato, API Express/PostgreSQL e SPA React.
 
 ## Requisitos
 - Node.js 24 LTS
@@ -16,16 +14,19 @@ npm ci
 npm run db:migrate
 npm run db:seed
 npm test
-npm run build
+npm run test:web
 npm run start:api
 ```
 
-O primeiro `npm install` gera `package-lock.json`. Valide e versione o lockfile; depois troque o CI para `npm ci`.
-
-Abra `http://localhost:3000/`; Portfolio é a entrada principal. Para desenvolvimento separado, execute `npm run dev:api` e `npm run dev:web` em terminais distintos.
+Use um PostgreSQL 18 descartável em `TEST_DATABASE_URL` ao executar testes: as suítes criam operações e conexões. Sem ele, os testes PostgreSQL são pulados e a V1.2 não atende o gate. Abra `http://localhost:3000/dashboard`. O procedimento completo, inclusive QA Chromium desktop/mobile, retenção e recuperação, está em [RUNBOOK-V1.2.md](docs/RUNBOOK-V1.2.md).
 
 ## API
 - `GET /health`
+- `GET /v1/dashboard`
+- `GET /v1/portfolio`
+- `GET /v1/connections`
+- `GET /v1/connections/sync-runs`
+- `GET /v1/connections/reconciliation`
 - `POST /v1/operations/preview`
 
 ## Invariantes
@@ -35,21 +36,4 @@ Abra `http://localhost:3000/`; Portfolio é a entrada principal. Para desenvolvi
 - O backend é a fonte de verdade dos cálculos críticos.
 - Integrações financeiras externas são read-only na Beta.
 
-## V0.2
-
-Inclui:
-- PostgreSQL pool/transaction boundary
-- Strategy repository + `GET /v1/strategies`
-- `POST /v1/operations` para `EQUITY_HOLDING@1`
-- seed de conta manual + EMBR3/OIBR3
-- migration/seed scripts
-
-### Banco local
-```bash
-export DATABASE_URL=postgresql://proinvest:proinvest@localhost:5432/proinvest
-npm run db:migrate
-npm run db:seed
-npm run dev:api
-```
-
-> Os runners de migration/seed são bootstrap-only. Antes de produção, o projeto deve adotar tracking explícito de migrations e execução idempotente.
+O provider live permanece pendente de escolha explícita. Autenticação, autorização por conta, KMS, TLS, backup/restore e incidentes pertencem ao gate posterior de produção pública. Consulte [GATES.md](docs/GATES.md) para o status formal.

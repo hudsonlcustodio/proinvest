@@ -1,0 +1,6 @@
+export type ConnectorCapability="READ_FILE"|"DISCOVER_ACCOUNTS"|"FETCH_RECORDS";
+export interface ConnectorProvider{key:string;name:string;kind:"FILE"|"LIVE";readOnly:true;capabilities:ConnectorCapability[];available:boolean}
+export interface ReadOnlyConnector{readonly provider:ConnectorProvider;testConnection():Promise<{ok:boolean;capabilities:ConnectorCapability[]}>;fetchRecords(input:{content:string;filename:string}):Promise<Array<Record<string,string>>>}
+export interface ConnectionView{id:string;providerKey:string;displayName:string;status:"ACTIVE"|"REVOKED";readOnly:true;capabilities:ConnectorCapability[];lastSyncAt:string|null;hasCredential:boolean}
+export interface SyncRunView{id:string;connectionId:string;status:"RUNNING"|"COMPLETED"|"FAILED";startedAt:string;completedAt:string|null;durationMs:number|null;fetched:number;imported:number;duplicate:number;ready:number;pending:number;rejected:number;errorCode:string|null}
+export interface StagingRecordView{id:string;connectionId:string;syncRunId:string;externalId:string|null;status:"PENDING"|"READY"|"IMPORTED"|"REJECTED"|"DUPLICATE";issues:string[];normalized:Record<string,string|null>;strategyId:string|null;instrumentId:string|null;accountId:string|null;canonicalOperationId:string|null;createdAt:string}

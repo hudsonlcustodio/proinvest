@@ -27,7 +27,17 @@ export interface CreateEquityHoldingCommand {
 
 export async function createEquityHolding(
   command: CreateEquityHoldingCommand,
-  idempotencyKey: string
+  idempotencyKey: string,
+  source: {sourceType:"MANUAL"|"FILE_IMPORT";sourceId?:string;externalId?:string}={sourceType:"MANUAL"}
+) {
+  return withTransaction((client) => createEquityHoldingInTransaction(client, command, idempotencyKey, source));
+}
+
+export async function createEquityHoldingInTransaction(
+  client: PoolClient,
+  command: CreateEquityHoldingCommand,
+  idempotencyKey: string,
+  source: {sourceType:"MANUAL"|"FILE_IMPORT";sourceId?:string;externalId?:string}={sourceType:"MANUAL"}
 ) {
   const metrics = calculateEquityHolding({
     quantity: command.quantity,
@@ -35,7 +45,6 @@ export async function createEquityHolding(
     currency: command.currency
   });
 
-  return withTransaction(async (client: PoolClient) => {
     const reservation = await reserveIdempotencyKey(
       client,
       idempotencyKey,
@@ -55,7 +64,7 @@ export async function createEquityHolding(
 
     const operationId = await insertEquityHolding(client, {
       ...command,
-      sourceType: "MANUAL"
+      ...source
     });
 
     const body = {
@@ -67,7 +76,6 @@ export async function createEquityHolding(
 
     await completeIdempotencyKey(client, idempotencyKey, 201, body, operationId);
     return { statusCode: 201, body };
-  });
 }
 
 export async function createEquityPair(command: {strategyId:string;accountId:string;openedAt:string;legs:Array<{instrumentId:string;side:"BUY"|"SELL";quantity:string;entryPrice:string;currency:string}>}, idempotencyKey:string) {

@@ -1,0 +1,3 @@
+external_id,strategy_code,account_name,symbol,side,quantity,entry_price,currency,opened_at
+browser-imp-1,STR-001,Conta Manual Beta,EMBR3,BUY,3,39.10,BRL,2026-08-29T14:00:00Z
+browser-imp-2,UNKNOWN,Conta Manual Beta,OIBR3,BUY,4,11.25,BRL,2026-08-29T14:05:00Z
