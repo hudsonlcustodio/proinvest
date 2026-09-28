@@ -32,6 +32,8 @@ test("real browser: CSV to staging to canonical Portfolio and Dashboard", async 
   await expect(readyRow).toBeVisible();
   await readyRow.getByRole("button", { name: "Confirmar e importar" }).click();
   await expect(readyRow.locator(".status")).toHaveText("Importado");
+  await expect(readyRow.getByText("Nenhuma ação pendente.", { exact: false })).toBeVisible();
+  await expect(readyRow.getByRole("button", { name: "Confirmar e importar" })).toHaveCount(0);
   const pendingRow = page.locator("article.reconciliation-card").filter({ has: page.getByText(pendingExternalId, { exact: true }) });
   await expect(pendingRow.locator(".status")).toHaveText("Pendente");
   await pendingRow.getByLabel("Strategy").selectOption({ label: "Microcaps" });
@@ -41,6 +43,7 @@ test("real browser: CSV to staging to canonical Portfolio and Dashboard", async 
   await expect(pendingRow.locator(".status")).toHaveText("Pronto");
   await pendingRow.getByRole("button", { name: "Confirmar e importar" }).click();
   await expect(pendingRow.locator(".status")).toHaveText("Importado");
+  await expect(pendingRow.getByRole("button", { name: "Rejeitar" })).toHaveCount(0);
   await page.screenshot({ path: testInfo.outputPath("reconciliation.png"), fullPage: true });
 
   const operation = await request.get(`/v1/connections/reconciliation`);

@@ -3,10 +3,26 @@
 ## V1.2 gates
 
 - `GATE-PORTFOLIO-INTELLIGENCE`: PASS. PostgreSQL 18 browser QA, full regression and Actions run `33270737913` are green.
-- `GATE-CONNECTIONS-CORE`: NOT STARTED.
+- `GATE-CONNECTIONS-CORE`: PASS for private, read-only CSV ingestion and human reconciliation.
 - `GATE-CONNECTIONS-LIVE`: PENDING_PROVIDER_SELECTION; no provider is approved.
-- `GATE-V1.2-INTELLIGENCE-BETA`: NOT STARTED.
+- `GATE-V1.2-INTELLIGENCE-BETA`: PASS for a private single-owner beta, subject to the green PR checks; public deployment is not approved.
 - `GATE-PROD-PUBLIC`: OUT OF SCOPE.
+
+## Connections Core and V1.2 private beta
+
+Evidence: PR #12 CI on PostgreSQL 18 with idempotent migrations, isolated disposable databases for integration and real Chromium QA, 44 server/domain/database tests with zero skipped, 15 frontend tests, four desktop/mobile browser tests, and zero high-severity npm audit findings. The browser suite covers CSV upload, READY/PENDING reconciliation, canonical promotion, Portfolio/Dashboard/Sync navigation, responsive overflow and Dashboard response-time samples. Browser screenshots are retained as CI artifacts. See `docs/RUNBOOK-V1.2.md` and `docs/THREAT-MODEL-CONNECTIONS-V1.md` for operating and security boundaries.
+
+- CONN-001: PASS — invalid financial rows are rejected; unresolved references are pending, not silently accepted.
+- CONN-002: PASS — Strategy template, equity instrument symbol/currency and active account are checked before promotion.
+- CONN-003: PASS — external identity is unique per connection; exact replay deduplicates and altered replay conflicts without overwriting canonical history.
+- CONN-004: PASS — staging row lock, canonical write and terminal transition occur in one PostgreSQL transaction; concurrent confirmation creates one operation.
+- CONN-005: PASS — ready/pending/imported/rejected/duplicate counters reconcile with fetched records.
+- CONN-006: PASS — Dashboard filters, valuation coverage, leverage and latest failed-sync indicators reflect persisted scoped data; error, empty and success are distinct UI states.
+- CONN-007: PASS — terminal staging retention is an explicit daily 90-day maintenance policy; actionable rows and canonical provenance are preserved.
+- CONN-008: PASS — read-only provider capability, no credential echo, AES-GCM secret storage boundary, sanitized errors, security headers, loopback-by-default binding and dependency audit have regression evidence.
+- CONN-009: PASS — desktop/mobile Chromium QA and full PostgreSQL regression run in CI with zero skipped tests; browser QA uses its own disposable database.
+
+[DECISÃO] `GATE-CONNECTIONS-CORE = PASS` and `GATE-V1.2-INTELLIGENCE-BETA = PASS` for the private single-owner CSV beta. `GATE-CONNECTIONS-LIVE = PENDING_PROVIDER_SELECTION`: no live provider was approved or implemented. Authentication/authorization, managed KMS, TLS, backup/restore, rate limits and incident operations remain requirements for the later `GATE-PROD-PUBLIC`, not claims of this beta.
 
 ## Portfolio Intelligence
 

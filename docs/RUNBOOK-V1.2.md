@@ -4,7 +4,7 @@
 
 This runbook covers a private single-owner instance only. Public production is outside this gate. Use Node 24 and PostgreSQL 18. Never point tests or browser QA at a database containing user data: the suites create operations, accounts, connections and staging records.
 
-Set `DATABASE_URL` and `TEST_DATABASE_URL` to a disposable PostgreSQL 18 database, using uncommitted environment values. `CONNECTION_MASTER_KEY` must be a base64-encoded 32-byte key only when storing a connection credential; CSV file import does not require one. Never commit or log keys.
+Copy `.env.example` to an uncommitted `.env` or export the values in the shell. Node 24 scripts load `.env` when present. Use a private application PostgreSQL 18 database for `DATABASE_URL`, and a separate disposable PostgreSQL 18 database for `TEST_DATABASE_URL`. `CONNECTION_MASTER_KEY` must be a base64-encoded 32-byte key only when storing a connection credential; CSV file import does not require one. Never commit or log keys.
 
 ## Clean verification
 

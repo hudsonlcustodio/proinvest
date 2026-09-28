@@ -148,7 +148,7 @@ export function ReconciliationPage() {
   };
   const action = async (item: StagingRecordView, name: "promote" | "reject") => {
     setBusyId(item.id); setNotice(null);
-    try { await api(`/v1/connections/reconciliation/${item.id}/${name}`, json("POST")); if (await load()) setNotice({ kind: "success", text: name === "promote" ? "Operação importada com provenance." : "Registro rejeitado." }); }
+    try { await api(`/v1/connections/reconciliation/${item.id}/${name}`, json("POST")); if (await load()) setNotice({ kind: "success", text: name === "promote" ? "Operação importada com origem rastreável." : "Registro rejeitado." }); }
     catch (error) { setNotice({ kind: "error", text: errorText(error) }); }
     finally { setBusyId(null); }
   };
@@ -167,7 +167,12 @@ export function ReconciliationPage() {
             <select className="select" name="accountId" aria-label="Conta" required defaultValue={item.accountId ?? ""}><option value="">Conta</option>{refs.accounts.map(x => <option key={x.id} value={x.id}>{x.name}</option>)}</select>
             <button className="button secondary" disabled={busyId === item.id}>Resolver</button>
           </form>}
-          <div className="form-actions"><button className="button secondary" disabled={busyId === item.id || !["PENDING", "READY"].includes(item.status)} onClick={() => void action(item, "reject")}>Rejeitar</button><button className="button primary" disabled={busyId === item.id || item.status !== "READY"} onClick={() => void action(item, "promote")}>Confirmar e importar</button></div>
+          {(["PENDING", "READY"].includes(item.status)) && <div className="form-actions">
+            <button className="button secondary" disabled={busyId === item.id} onClick={() => void action(item, "reject")}>Rejeitar</button>
+            {item.status === "READY" && <button className="button primary" disabled={busyId === item.id} onClick={() => void action(item, "promote")}>Confirmar e importar</button>}
+          </div>}
+          {item.status === "IMPORTED" && <p className="muted">Operação incorporada ao portfólio. Nenhuma ação pendente.</p>}
+          {item.status === "REJECTED" && <p className="muted">Registro rejeitado. Nenhuma ação pendente.</p>}
         </article>)}
         {!items.length && <div className="state"><CheckCircle size={24} /><h3>Nada para reconciliar</h3><p>Registros importados ou rejeitados continuam auditáveis quando existirem.</p></div>}
       </div>}
